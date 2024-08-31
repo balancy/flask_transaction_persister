@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://username:password@db:5432/db
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    entrypoint: ["sh", "-c", "python -m persistence.init_db && flask run --reload"]
+
+volumes:
+  db_data:

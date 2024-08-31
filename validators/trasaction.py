@@ -1,4 +1,4 @@
-"""Module for validation classes."""
+"""Incoming transaction validation."""
 
 from datetime import datetime
 from typing import Annotated
