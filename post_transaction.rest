@@ -3,7 +3,7 @@ POST http://localhost:5000/transaction
 Content-Type: application/json
 
 {
-  "transaction_id": "12345",
+  "transaction_id": "12347",
   "user_id": "54321",
   "amount": 150.0,
   "currency": "USD",

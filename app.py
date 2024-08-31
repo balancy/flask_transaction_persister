@@ -7,8 +7,8 @@ from flask.wrappers import Response
 from pydantic import ValidationError
 
 from loggers.app_logger import logger
-from services.dependency_injector import get_transaction_service
-from validators.trasaction import IncomingTransaction
+from schemas.transaction_schema import TransactionSchema
+from services.transaction_service import service_dependency
 
 app = Flask(__name__)
 
@@ -24,7 +24,7 @@ def post_transaction() -> tuple[Response, Literal[400] | Literal[200] | Literal[
     """Post transaction data to the server."""
 
     try:
-        transaction_data = IncomingTransaction.model_validate(request.get_json())
+        transaction_data = TransactionSchema.model_validate(request.get_json())
         logger.info(f"Transaction received: %s", transaction_data.model_dump())
     except ValidationError as error:
         logger.error("Validation error: %s", error.errors())
@@ -35,7 +35,7 @@ def post_transaction() -> tuple[Response, Literal[400] | Literal[200] | Literal[
         transaction_data.transaction_id,
     )
 
-    transaction_service = get_transaction_service()
+    transaction_service = service_dependency()
 
     try:
         result = transaction_service.save_transaction(transaction_data)
@@ -46,7 +46,7 @@ def post_transaction() -> tuple[Response, Literal[400] | Literal[200] | Literal[
         return jsonify(result), 200
     except Exception as ex:
         logger.error(str(ex))
-        return jsonify({"error": "Failed to save transaction"}), 500
+        return jsonify({"error": str(ex)}), 500
 
 
 if __name__ == "__main__":

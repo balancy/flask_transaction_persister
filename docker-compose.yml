@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:16
+    container_name: transaction-flask-db
     environment:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
@@ -14,17 +15,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: prod
+    container_name: transaction-flask-app
     ports:
       - "5000:5000"
     environment:
       - DATABASE_URL=postgresql+psycopg2://username:password@db:5432/db
       - FLASK_APP=app.py
-      - FLASK_ENV=development
+      - FLASK_ENV=production
     depends_on:
       - db
-    volumes:
-      - .:/app
-    entrypoint: ["sh", "-c", "python -m persistence.init_db && flask run --reload"]
+    entrypoint: ["sh", "-c", "./wait-for-it.sh db:5432 -- python -m persistence.init_db &&  gunicorn -w 4 -b 0.0.0.0:5000 app:app"]
 
 volumes:
   db_data:

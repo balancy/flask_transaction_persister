@@ -1,4 +1,4 @@
-"""Incoming transaction validation."""
+"""Incoming transaction schema module."""
 
 from datetime import datetime
 from typing import Annotated
@@ -6,8 +6,8 @@ from typing import Annotated
 from pydantic import BaseModel, Field, StringConstraints
 
 
-class IncomingTransaction(BaseModel):
-    """Incoming transaction data."""
+class TransactionSchema(BaseModel):
+    """Incoming transaction schema."""
 
     transaction_id: Annotated[str, StringConstraints(min_length=1)]
     user_id: Annotated[str, StringConstraints(min_length=1)]

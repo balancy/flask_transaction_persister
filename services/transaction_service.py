@@ -1,19 +1,18 @@
 """Transaction service module."""
 
-from sqlalchemy.orm.session import Session
-
 from persistence.models import TransactionModel
-from validators.trasaction import IncomingTransaction
+from persistence.repo import TransactionRepository, repo_dependency
+from schemas.transaction_schema import TransactionSchema
 
 
 class TransactionService:
     """Transaction service class."""
 
-    def __init__(self, db: Session) -> None:
+    def __init__(self, repo: TransactionRepository = repo_dependency()) -> None:
         """Initialize service."""
-        self.db = db
+        self.repo = repo
 
-    def save_transaction(self, transaction_data: IncomingTransaction) -> dict[str, str]:
+    def save_transaction(self, transaction_data: TransactionSchema) -> dict[str, str]:
         """Save transaction."""
 
         new_transaction = TransactionModel(
@@ -25,10 +24,12 @@ class TransactionService:
         )
 
         try:
-            self.db.add(new_transaction)
-            self.db.commit()
-            self.db.refresh(new_transaction)
+            self.repo.add_transaction(new_transaction)
             return {"status": "Transaction saved successfully"}
-        except Exception as ex:
-            self.db.rollback()
-            raise Exception(f"Failed to save transaction: {ex}")
+        except Exception:
+            raise
+
+
+def service_dependency() -> TransactionService:
+    """Get transaction service instance."""
+    return TransactionService()

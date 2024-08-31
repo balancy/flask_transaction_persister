@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      target: dev
+    environment:
+      - FLASK_ENV=development
+    volumes:
+      - .:/app
+    entrypoint: ["sh", "-c", "./wait-for-it.sh db:5432 -- flask run --reload"]
