@@ -11,7 +11,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 
 ENV PATH="/root/.local/bin:$PATH"
 
-COPY pyproject.toml poetry.lock /app/
+COPY src/pyproject.toml src/poetry.lock /app/
 
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --only main
 
@@ -23,13 +23,15 @@ WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-COPY . /app
+COPY src /app/src
+COPY wait-for-it.sh /app/wait-for-it.sh
 
-EXPOSE 5000
-
-ENV FLASK_APP=app.py
+ENV PYTHONPATH=/app/src
+ENV FLASK_APP=src.app
 ENV FLASK_ENV=development
 ENV FLASK_RUN_HOST=0.0.0.0
+
+EXPOSE 5000
 
 CMD ["flask", "run", "--reload"]
 
@@ -41,11 +43,14 @@ WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-COPY . /app
+COPY src /app/src
+COPY wait-for-it.sh /app/wait-for-it.sh
+
+ENV PYTHONPATH=/app/src
+ENV FLASK_APP=src.app:app
+ENV FLASK_ENV=development
+ENV FLASK_RUN_HOST=0.0.0.0
 
 EXPOSE 5000
 
-ENV FLASK_APP=app:app
-ENV FLASK_RUN_HOST=0.0.0.0
-
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "src.app:app"]
