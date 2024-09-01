@@ -27,7 +27,7 @@ COPY src /app/src
 COPY wait-for-it.sh entrypoint.sh alembic.ini /app/
 
 ENV PYTHONPATH=/app/src
-ENV FLASK_APP=src.app
+ENV FLASK_APP=src.app:create_app()
 ENV FLASK_ENV=development
 ENV FLASK_RUN_HOST=0.0.0.0
 
@@ -47,10 +47,10 @@ COPY src /app/src
 COPY wait-for-it.sh entrypoint.sh alembic.ini /app/
 
 ENV PYTHONPATH=/app/src
-ENV FLASK_APP=src.app:app
+ENV FLASK_APP=src.app:create_app()
 ENV FLASK_ENV=development
 ENV FLASK_RUN_HOST=0.0.0.0
 
 EXPOSE 5000
 
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "src.app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", $FLASK_APP]

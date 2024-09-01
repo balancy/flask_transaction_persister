@@ -1,6 +1,6 @@
 """Incoming transaction schema module."""
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Annotated
 
@@ -20,6 +20,7 @@ class IncomingTransactionSchema(BaseModel):
 @dataclass(frozen=True, slots=True)
 class EnrichedTransactionSchema:
     """Enriched transaction schema.
+
     Includes converted amount, exchange rate and target currency.
     """
 
@@ -31,3 +32,7 @@ class EnrichedTransactionSchema:
     target_currency: str
     exchange_rate: float
     timestamp: datetime
+
+    def asdict(self) -> dict:
+        """Return transaction data as dictionary."""
+        return asdict(self)

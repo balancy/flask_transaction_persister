@@ -5,3 +5,6 @@
 
 # Apply database migrations
 alembic upgrade head
+
+# Execute the main container command
+exec "$@"

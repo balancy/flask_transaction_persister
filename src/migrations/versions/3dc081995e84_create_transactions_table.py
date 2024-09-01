@@ -1,7 +1,7 @@
 """Create transactions table.
 
 Revision ID: 3dc081995e84
-Revises: 
+Revises:
 Create Date: 2024-09-01 09:19:38.154174
 
 """

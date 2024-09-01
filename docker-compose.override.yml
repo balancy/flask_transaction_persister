@@ -6,4 +6,4 @@ services:
       - FLASK_ENV=development
     volumes:
       - ./src:/app/src
-    entrypoint: ["sh", "-c", "./entrypoint.sh && flask run --reload"]
+    entrypoint: ["sh", "-c", "./entrypoint.sh flask run --reload"]

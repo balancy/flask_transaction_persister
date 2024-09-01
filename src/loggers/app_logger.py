@@ -4,7 +4,7 @@ import logging
 
 
 def setup_logger() -> logging.Logger:
-    """Setup logger."""
+    """Set up logger."""
     logger = logging.getLogger("app_logger")
     logger.setLevel(logging.INFO)
 

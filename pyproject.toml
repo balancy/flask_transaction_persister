@@ -17,11 +17,13 @@ psycopg2-binary = "^2.9.9"
 gunicorn = "^23.0.0"
 alembic = "^1.13.2"
 requests = "^2.32.3"
+flask-injector = "^0.15.0"
 
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
 ruff = "^0.6.3"
+pre-commit = "^3.8.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -43,7 +45,9 @@ lint.ignore = [
   "RUF001",
   "S101",
   "TCH003",
+  "I001",
 ]
+exclude = ["src/migrations/", "tests/"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 5
