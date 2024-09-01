@@ -11,7 +11,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 
 ENV PATH="/root/.local/bin:$PATH"
 
-COPY src/pyproject.toml src/poetry.lock /app/
+COPY pyproject.toml poetry.lock /app/
 
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --only main
 
@@ -24,7 +24,7 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 COPY src /app/src
-COPY wait-for-it.sh /app/wait-for-it.sh
+COPY wait-for-it.sh entrypoint.sh alembic.ini /app/
 
 ENV PYTHONPATH=/app/src
 ENV FLASK_APP=src.app
@@ -44,7 +44,7 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 COPY src /app/src
-COPY wait-for-it.sh /app/wait-for-it.sh
+COPY wait-for-it.sh entrypoint.sh alembic.ini /app/
 
 ENV PYTHONPATH=/app/src
 ENV FLASK_APP=src.app:app

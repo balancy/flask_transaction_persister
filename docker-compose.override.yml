@@ -6,4 +6,4 @@ services:
       - FLASK_ENV=development
     volumes:
       - ./src:/app/src
-    entrypoint: ["sh", "-c", "./wait-for-it.sh db:5432 -- python -m persistence.init_db && flask run --reload"]
+    entrypoint: ["sh", "-c", "./entrypoint.sh && flask run --reload"]

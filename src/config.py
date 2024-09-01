@@ -7,5 +7,5 @@ env.read_env()
 
 DATABASE_URL = env.str(
     "DATABASE_URL",
-    "postgresql+psycopg2://username:password@localhost:5432/yourdatabase",
+    "postgresql+psycopg2://username:password@localhost:5432/db",
 )
