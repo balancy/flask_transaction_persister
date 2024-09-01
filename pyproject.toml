@@ -16,8 +16,37 @@ environs = "^11.0.0"
 psycopg2-binary = "^2.9.9"
 gunicorn = "^23.0.0"
 alembic = "^1.13.2"
+requests = "^2.32.3"
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+ruff = "^0.6.3"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+lint.select = ["ALL"]
+line-length = 79
+lint.ignore = [
+  "G004",
+  "ANN401",
+  "D105",
+  "D203",
+  "D213",
+  "ARG002",
+  "RUF012",
+  "DJ001",
+  "PGH003",
+  "RUF001",
+  "S101",
+  "TCH003",
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 5
+
+[tool.black]
+line-length = 79

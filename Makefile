@@ -8,3 +8,7 @@ prod:
 
 stop:
 	@docker compose down
+
+lint:
+	@ruff check src
+	@black --check src

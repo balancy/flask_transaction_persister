@@ -16,7 +16,7 @@ COPY pyproject.toml poetry.lock /app/
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --only main
 
 # Stage 2: Development stage
-FROM python:3.12-slim as dev
+FROM python:3.12-slim AS dev
 
 WORKDIR /app
 

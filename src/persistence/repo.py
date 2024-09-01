@@ -1,11 +1,10 @@
 """Repositories module."""
 
-import psycopg2
-from sqlalchemy.orm import Session
-
 from persistence.db import session_dependency
 from persistence.models import TransactionModel
-from schemas.transaction_schema import TransactionSchema
+from schemas.transaction_schema import EnrichedTransactionSchema
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 
 class TransactionRepository:
@@ -17,14 +16,17 @@ class TransactionRepository:
 
     def add_transaction(
         self,
-        transaction_data: TransactionSchema,
+        transaction_data: EnrichedTransactionSchema,
     ) -> TransactionModel:
         """Add a new transaction to the database."""
         new_transaction = TransactionModel(
             transaction_id=transaction_data.transaction_id,
             user_id=transaction_data.user_id,
-            amount=float(transaction_data.amount),
-            currency=transaction_data.currency,
+            original_amount=transaction_data.original_amount,
+            original_currency=transaction_data.original_currency,
+            converted_amount=transaction_data.converted_amount,
+            exchange_rate=transaction_data.exchange_rate,
+            target_currency=transaction_data.target_currency,
             timestamp=transaction_data.timestamp,
         )
 
@@ -33,12 +35,12 @@ class TransactionRepository:
             self.db.commit()
             self.db.refresh(new_transaction)
             return new_transaction
-        except psycopg2.errors.UniqueViolation:
+        except IntegrityError:
             self.db.rollback()
-            raise Exception("Transaction ID already exists")
-        except Exception as ex:
+            raise
+        except Exception:
             self.db.rollback()
-            raise Exception(f"Failed to save transaction: {ex}")
+            raise
 
 
 def repo_dependency() -> TransactionRepository:

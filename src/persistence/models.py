@@ -13,6 +13,9 @@ class TransactionModel(Base):
 
     transaction_id = Column(String, primary_key=True, index=True)
     user_id = Column(String, index=True)
-    amount = Column(Float)
-    currency = Column(String)
+    original_amount = Column(Float)
+    original_currency = Column(String)
+    converted_amount = Column(Float)
+    target_currency = Column(String)
+    exchange_rate = Column(Float)
     timestamp = Column(DateTime)
