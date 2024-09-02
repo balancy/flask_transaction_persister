@@ -3,8 +3,14 @@
 from injector import Binder, singleton
 
 from application.services.exchange_rates_service import ExchangeRatesService
-from application.services.transaction_service import TransactionService
+from application.services.incoming_transaction_processing_service import (
+    IncomingTransactionProcessingService,
+)
+from application.services.modified_transaction_processing_services import (
+    ModifiedTransactionProcessingService,
+)
 from infrastructure.external_api.clients import ExternalExchangeRatesClient
+from infrastructure.messaging.queue_client import QueueClient
 from infrastructure.persistence.repositories import TransactionRepository
 
 
@@ -21,12 +27,22 @@ def configure_dependencies(binder: Binder) -> None:
         scope=singleton,
     )
     binder.bind(
-        TransactionService,
-        to=TransactionService,
+        IncomingTransactionProcessingService,
+        to=IncomingTransactionProcessingService,
+        scope=singleton,
+    )
+    binder.bind(
+        ModifiedTransactionProcessingService,
+        to=ModifiedTransactionProcessingService,
         scope=singleton,
     )
     binder.bind(
         ExternalExchangeRatesClient,
         to=ExternalExchangeRatesClient,
+        scope=singleton,
+    )
+    binder.bind(
+        QueueClient,
+        to=QueueClient,
         scope=singleton,
     )

@@ -5,9 +5,13 @@ from __future__ import annotations
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from application.dtos import TransactionDTO
 from domain.models import Transaction
 from infrastructure.persistence.db import session_dependency
-from infrastructure.persistence.models import TransactionModel
+from infrastructure.persistence.models import (
+    IncomingTransactionModel,
+    TransactionModel,
+)
 from utils.exceptions import TransactionIntegrityError
 
 
@@ -18,12 +22,13 @@ class TransactionRepository:
         """Initialize repository with the database session."""
         self.db = db or session_dependency()
 
-    def save(
+    def _save(
         self,
-        transaction_data: Transaction,
-    ) -> TransactionModel:
+        transaction_data: TransactionDTO | Transaction,
+        model: type[TransactionModel | IncomingTransactionModel],
+    ) -> IncomingTransactionModel | TransactionModel:
         """Save transaction to the database."""
-        transaction = TransactionModel(**transaction_data.asdict())
+        transaction = model(**transaction_data.to_dict())
 
         try:
             self.db.add(transaction)
@@ -39,3 +44,17 @@ class TransactionRepository:
             raise
 
         return transaction
+
+    def save_incoming_transaction(
+        self,
+        transaction_data: TransactionDTO,
+    ) -> IncomingTransactionModel:
+        """Save incoming transaction to the database."""
+        return self._save(transaction_data, IncomingTransactionModel)
+
+    def save_modified_transaction(
+        self,
+        transaction_data: Transaction,
+    ) -> TransactionModel:
+        """Save transaction to the database."""
+        return self._save(transaction_data, TransactionModel)

@@ -6,6 +6,18 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
+class IncomingTransactionModel(Base):
+    """Incoming transaction model."""
+
+    __tablename__ = "incoming_transactions"
+
+    transaction_id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, index=True)
+    amount = Column(Float)
+    currency = Column(String)
+    timestamp = Column(DateTime)
+
+
 class TransactionModel(Base):
     """Transaction model."""
 

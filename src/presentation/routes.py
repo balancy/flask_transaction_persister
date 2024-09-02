@@ -8,7 +8,9 @@ from flask import Blueprint, Response, jsonify, request
 from pydantic import ValidationError
 
 from application.dtos import TransactionDTO
-from application.services.transaction_service import TransactionService
+from application.services.incoming_transaction_processing_service import (
+    IncomingTransactionProcessingService,
+)
 from presentation.schemas import IncomingTransactionSchema
 from utils.app_logger import logger
 from utils.exceptions import TransactionIntegrityError
@@ -24,7 +26,7 @@ def index() -> tuple[Response, HTTPStatus]:
 
 @routes_blueprint.route("/transaction", methods=["POST"])
 def post_transaction(
-    transaction_service: TransactionService,
+    transaction_service: IncomingTransactionProcessingService,
 ) -> tuple[Response, HTTPStatus]:
     """Post transaction data to the server."""
     try:
@@ -37,16 +39,17 @@ def post_transaction(
         return jsonify({"error": str(error)}), HTTPStatus.BAD_REQUEST
 
     logger.info(
-        "Transaction processed successfully: %s",
+        "Transaction validated successfully: %s",
         transaction_data.transaction_id,
     )
 
     transaction_dto = TransactionDTO(**transaction_data.model_dump())
 
     try:
-        result = transaction_service.save_transaction(transaction_dto)
-        logger.info(result)
-        return jsonify(result), HTTPStatus.CREATED
+        result = transaction_service.process_transaction(transaction_dto)
     except TransactionIntegrityError as ex:
         logger.error(str(ex))
-        return (jsonify({"error": str(ex)}), HTTPStatus.CONFLICT)
+        return jsonify({"error": str(ex)}), HTTPStatus.CONFLICT
+
+    logger.info(result)
+    return jsonify(result), HTTPStatus.CREATED

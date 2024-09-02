@@ -10,7 +10,6 @@ from presentation.routes import routes_blueprint
 def create_app() -> Flask:
     """Create the Flask app."""
     app = Flask(__name__)
-
     app.register_blueprint(routes_blueprint)
 
     FlaskInjector(app=app, modules=[configure_dependencies])

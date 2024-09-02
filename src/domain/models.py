@@ -17,6 +17,6 @@ class Transaction:
     exchange_rate: float
     timestamp: datetime
 
-    def asdict(self) -> dict:
+    def to_dict(self) -> dict:
         """Return transaction data as dictionary."""
         return asdict(self)
