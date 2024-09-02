@@ -2,9 +2,10 @@
 
 from injector import Binder, singleton
 
-from persistence.repo import TransactionRepository
-from services.exchange_rates_service import ExchangeRatesService
-from services.transaction_service import TransactionService
+from application.services.exchange_rates_service import ExchangeRatesService
+from application.services.transaction_service import TransactionService
+from infrastructure.external_api.clients import ExternalExchangeRatesClient
+from infrastructure.persistence.repositories import TransactionRepository
 
 
 def configure_dependencies(binder: Binder) -> None:
@@ -22,5 +23,10 @@ def configure_dependencies(binder: Binder) -> None:
     binder.bind(
         TransactionService,
         to=TransactionService,
+        scope=singleton,
+    )
+    binder.bind(
+        ExternalExchangeRatesClient,
+        to=ExternalExchangeRatesClient,
         scope=singleton,
     )

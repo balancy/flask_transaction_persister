@@ -3,28 +3,26 @@
 from __future__ import annotations
 
 from http import HTTPStatus
-from typing import TYPE_CHECKING
 
 from flask import Blueprint, Response, jsonify, request
-from loggers.app_logger import logger
 from pydantic import ValidationError
-from sqlalchemy.exc import IntegrityError
 
-from src.schemas.transaction_schema import IncomingTransactionSchema
+from application.dtos import TransactionDTO
+from application.services.transaction_service import TransactionService
+from presentation.schemas import IncomingTransactionSchema
+from utils.app_logger import logger
+from utils.exceptions import TransactionIntegrityError
 
-if TYPE_CHECKING:
-    from services.transaction_service import TransactionService
-
-blueprint = Blueprint("transaction", __name__)
+routes_blueprint = Blueprint("transaction", __name__)
 
 
-@blueprint.route("/")
+@routes_blueprint.route("/")
 def index() -> tuple[Response, HTTPStatus]:
     """Index route."""
     return jsonify({"status": "Server is running"}), HTTPStatus.OK
 
 
-@blueprint.route("/transaction", methods=["POST"])
+@routes_blueprint.route("/transaction", methods=["POST"])
 def post_transaction(
     transaction_service: TransactionService,
 ) -> tuple[Response, HTTPStatus]:
@@ -43,13 +41,12 @@ def post_transaction(
         transaction_data.transaction_id,
     )
 
+    transaction_dto = TransactionDTO(**transaction_data.model_dump())
+
     try:
-        result = transaction_service.save_transaction(transaction_data)
-        logger.info(
-            "Transaction saved successfully: %s",
-            transaction_data.transaction_id,
-        )
+        result = transaction_service.save_transaction(transaction_dto)
+        logger.info(result)
         return jsonify(result), HTTPStatus.CREATED
-    except IntegrityError as ex:
+    except TransactionIntegrityError as ex:
         logger.error(str(ex))
         return (jsonify({"error": str(ex)}), HTTPStatus.CONFLICT)

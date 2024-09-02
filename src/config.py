@@ -15,4 +15,4 @@ EXCHANGE_RATES_API_URL = env.str(
     "https://api.exchangerate-api.com/v4/latest/",
 )
 
-BASE_CURRENCY = env.str("BASE_CURENCY", "EUR")
+TARGET_CURRENCY = env.str("TARGET_CURENCY", "EUR")

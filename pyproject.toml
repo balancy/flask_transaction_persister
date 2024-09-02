@@ -44,10 +44,12 @@ lint.ignore = [
   "PGH003",
   "RUF001",
   "S101",
+  "TCH001",
+  "TCH002",
   "TCH003",
   "I001",
 ]
-exclude = ["src/migrations/", "tests/"]
+exclude = ["src/infrastructure/persistence/migrations/", "tests/"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 5

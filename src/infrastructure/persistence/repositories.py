@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from persistence.db import session_dependency
-from persistence.models import TransactionModel
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
-if TYPE_CHECKING:
-    from schemas.transaction_schema import EnrichedTransactionSchema
-    from sqlalchemy.orm import Session
+from domain.models import Transaction
+from infrastructure.persistence.db import session_dependency
+from infrastructure.persistence.models import TransactionModel
+from utils.exceptions import TransactionIntegrityError
 
 
 class TransactionRepository:
@@ -22,7 +20,7 @@ class TransactionRepository:
 
     def save(
         self,
-        transaction_data: EnrichedTransactionSchema,
+        transaction_data: Transaction,
     ) -> TransactionModel:
         """Save transaction to the database."""
         transaction = TransactionModel(**transaction_data.asdict())
@@ -33,7 +31,9 @@ class TransactionRepository:
             self.db.refresh(transaction)
         except IntegrityError:
             self.db.rollback()
-            raise
+            id_ = transaction_data.transaction_id
+            message = f"Transaction with ID {id_} already exists."
+            raise TransactionIntegrityError(message) from None
         except Exception:
             self.db.rollback()
             raise
