@@ -5,12 +5,11 @@ from __future__ import annotations
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from application.dtos import TransactionDTO
-from domain.models import Transaction
+from domain.models import IncomingTransaction, ProcessedTransaction
 from infrastructure.persistence.db import session_dependency
 from infrastructure.persistence.models import (
     IncomingTransactionModel,
-    TransactionModel,
+    ProcessedTransactionModel,
 )
 from utils.exceptions import TransactionIntegrityError
 
@@ -24,16 +23,15 @@ class TransactionRepository:
 
     def _save(
         self,
-        transaction_data: TransactionDTO | Transaction,
-        model: type[TransactionModel | IncomingTransactionModel],
-    ) -> IncomingTransactionModel | TransactionModel:
+        transaction_data: IncomingTransaction | ProcessedTransaction,
+        model: type[IncomingTransactionModel | ProcessedTransactionModel],
+    ) -> IncomingTransactionModel | ProcessedTransactionModel:
         """Save transaction to the database."""
         transaction = model(**transaction_data.to_dict())
 
         try:
             self.db.add(transaction)
             self.db.commit()
-            self.db.refresh(transaction)
         except IntegrityError:
             self.db.rollback()
             id_ = transaction_data.transaction_id
@@ -47,14 +45,14 @@ class TransactionRepository:
 
     def save_incoming_transaction(
         self,
-        transaction_data: TransactionDTO,
+        transaction_data: IncomingTransaction,
     ) -> IncomingTransactionModel:
         """Save incoming transaction to the database."""
         return self._save(transaction_data, IncomingTransactionModel)
 
     def save_modified_transaction(
         self,
-        transaction_data: Transaction,
-    ) -> TransactionModel:
+        transaction_data: ProcessedTransaction,
+    ) -> ProcessedTransactionModel:
         """Save transaction to the database."""
-        return self._save(transaction_data, TransactionModel)
+        return self._save(transaction_data, ProcessedTransactionModel)

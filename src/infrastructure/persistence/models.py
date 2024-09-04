@@ -18,8 +18,8 @@ class IncomingTransactionModel(Base):
     timestamp = Column(DateTime)
 
 
-class TransactionModel(Base):
-    """Transaction model."""
+class ProcessedTransactionModel(Base):
+    """Processed transaction model."""
 
     __tablename__ = "transactions"
 

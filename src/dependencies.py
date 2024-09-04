@@ -3,18 +3,18 @@
 from injector import Binder, singleton
 
 from application.services.exchange_rates_service import ExchangeRatesService
-from application.services.incoming_transaction_processing_service import (
-    IncomingTransactionProcessingService,
-)
-from application.services.modified_transaction_processing_services import (
-    ModifiedTransactionProcessingService,
+from application.services.processing_services import (
+    EnqueuedTransactionProcessingService,
 )
 from infrastructure.external_api.clients import ExternalExchangeRatesClient
 from infrastructure.messaging.queue_client import QueueClient
 from infrastructure.persistence.repositories import TransactionRepository
+from src.application.services.processing_services import (
+    IncomingTransactionProcessingService,
+)
 
 
-def configure_dependencies(binder: Binder) -> None:
+def configure_dependencies_for_app(binder: Binder) -> None:
     """Configure dependencies for Flask-Injector."""
     binder.bind(
         TransactionRepository,
@@ -32,8 +32,8 @@ def configure_dependencies(binder: Binder) -> None:
         scope=singleton,
     )
     binder.bind(
-        ModifiedTransactionProcessingService,
-        to=ModifiedTransactionProcessingService,
+        EnqueuedTransactionProcessingService,
+        to=EnqueuedTransactionProcessingService,
         scope=singleton,
     )
     binder.bind(
