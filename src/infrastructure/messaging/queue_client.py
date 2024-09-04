@@ -8,6 +8,8 @@ from typing import Any
 
 import pika
 
+from utils.context_managers import conditional_trace_context
+
 
 class QueueClient:
     """Queue client class."""
@@ -38,16 +40,18 @@ class QueueClient:
             "retries": 0,
             "eta": None,
         }
-        self.channel.basic_publish(
-            exchange="",
-            routing_key=self.queue_name,
-            body=json.dumps(message),
-            properties=pika.BasicProperties(
-                delivery_mode=2,  # Make message persistent
-                content_encoding="utf-8",
-                content_type="application/json",
-            ),
-        )
+
+        with conditional_trace_context(__name__, "enquque_transaction"):
+            self.channel.basic_publish(
+                exchange="",
+                routing_key=self.queue_name,
+                body=json.dumps(message),
+                properties=pika.BasicProperties(
+                    delivery_mode=2,  # Make message persistent
+                    content_encoding="utf-8",
+                    content_type="application/json",
+                ),
+            )
 
     def close_connection(self) -> None:
         """Close RabbitMQ connection."""

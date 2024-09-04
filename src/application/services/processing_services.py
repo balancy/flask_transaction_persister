@@ -98,7 +98,7 @@ class EnqueuedTransactionProcessingService:
             timestamp=transaction_data.timestamp,
         )
 
-        self.repo.save_modified_transaction(transaction_to_save)
+        self.repo.save_processed_transaction(transaction_to_save)
 
         transaction_id = transaction_data.transaction_id
         message = f"Transaction {transaction_id} saved successfully"

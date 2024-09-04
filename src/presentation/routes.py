@@ -13,6 +13,7 @@ from application.services.processing_services import (
 )
 from domain.models import IncomingTransaction
 from utils.app_logger import logger
+from utils.context_managers import conditional_trace_context
 from utils.exceptions import TransactionIntegrityError
 
 routes_blueprint = Blueprint("transaction", __name__)
@@ -33,20 +34,24 @@ def post_transaction(
     logger.info("Data received: %s", raw_data)
 
     try:
-        transaction_data = IncomingTransactionSchema.model_validate(raw_data)
+        with conditional_trace_context(__name__, "validate_incoming_data"):
+            validated_transaction = IncomingTransactionSchema.model_validate(
+                raw_data,
+            )
     except ValidationError as error:
         logger.error("Validation error: %s", error.errors())
         return jsonify({"error": str(error)}), HTTPStatus.BAD_REQUEST
 
     logger.info(
-        "Transaction validated successfully: %s",
-        transaction_data.transaction_id,
+        "Transaction validated: %s",
+        validated_transaction.transaction_id,
     )
 
-    incoming_transaction = IncomingTransaction(**transaction_data.model_dump())
+    transaction = IncomingTransaction(**validated_transaction.model_dump())
 
     try:
-        result = transaction_service.process_transaction(incoming_transaction)
+        with conditional_trace_context(__name__, "process_transaction"):
+            result = transaction_service.process_transaction(transaction)
     except TransactionIntegrityError as ex:
         logger.error(str(ex))
         return jsonify({"error": str(ex)}), HTTPStatus.CONFLICT

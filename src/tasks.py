@@ -11,6 +11,7 @@ from application.services.processing_services import (
     EnqueuedTransactionProcessingService,
 )
 from domain.models import IncomingTransaction
+from src.utils.context_managers import conditional_trace_context
 from utils.app_logger import logger
 from utils.exceptions import TransactionIntegrityError
 
@@ -27,7 +28,8 @@ def process_transaction(
     )
 
     try:
-        IncomingTransactionSchema.model_validate(transaction_data)
+        with conditional_trace_context(__name__, "validate_transaction"):
+            IncomingTransactionSchema.model_validate(transaction_data)
     except ValidationError as error:
         logger.error("Validation error: %s", error.errors())
         raise
@@ -36,7 +38,8 @@ def process_transaction(
     transaction_service = Injector().get(EnqueuedTransactionProcessingService)
 
     try:
-        transaction_service.process_transaction(transaction)
+        with conditional_trace_context(__name__, "process_transaction"):
+            transaction_service.process_transaction(transaction)
 
     except TransactionIntegrityError as ex:
         logger.error(str(ex))

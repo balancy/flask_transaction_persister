@@ -3,6 +3,7 @@
 import requests
 
 from config import EXCHANGE_RATES_API_URL
+from utils.context_managers import conditional_trace_context
 
 TIMEOUT = 5
 
@@ -17,10 +18,11 @@ class ExternalExchangeRatesClient:
     def get_rate(self, from_currency: str, to_currency: str) -> float:
         """Fetch the conversion rate between two currencies."""
         try:
-            response = requests.get(
-                f"{self.url}/{from_currency}",
-                timeout=TIMEOUT,
-            )
+            with conditional_trace_context(__name__, "fetch_exchange_rate"):
+                response = requests.get(
+                    f"{self.url}/{from_currency}",
+                    timeout=TIMEOUT,
+                )
         except requests.RequestException as e:
             message = f"Failed to fetch exchange rate: {e!s}"
             raise ConnectionError(message) from None

@@ -11,6 +11,7 @@ from infrastructure.persistence.models import (
     IncomingTransactionModel,
     ProcessedTransactionModel,
 )
+from utils.context_managers import conditional_trace_context
 from utils.exceptions import TransactionIntegrityError
 
 
@@ -48,11 +49,13 @@ class TransactionRepository:
         transaction_data: IncomingTransaction,
     ) -> IncomingTransactionModel:
         """Save incoming transaction to the database."""
-        return self._save(transaction_data, IncomingTransactionModel)
+        with conditional_trace_context(__name__, "save_incoming_transaction"):
+            return self._save(transaction_data, IncomingTransactionModel)
 
-    def save_modified_transaction(
+    def save_processed_transaction(
         self,
         transaction_data: ProcessedTransaction,
     ) -> ProcessedTransactionModel:
-        """Save transaction to the database."""
-        return self._save(transaction_data, ProcessedTransactionModel)
+        """Save processed transaction to the database."""
+        with conditional_trace_context(__name__, "save_processed_transaction"):
+            return self._save(transaction_data, ProcessedTransactionModel)

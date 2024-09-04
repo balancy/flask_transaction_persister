@@ -15,7 +15,7 @@ from config import JAEGER_AGENT_HOST, JAEGER_AGENT_PORT
 from utils.app_logger import logger
 
 
-def initialize_tracing(service_name: str) -> None:
+def _initialize_tracing(service_name: str) -> None:
     """Initialize tracing."""
     resource = Resource(attributes={"service.name": service_name})
     trace.set_tracer_provider(TracerProvider(resource=resource))
@@ -26,26 +26,27 @@ def initialize_tracing(service_name: str) -> None:
     span_processor = BatchSpanProcessor(exporter)
     trace.get_tracer_provider().add_span_processor(span_processor)
 
-
-def init_instruments_for_flask_app(flask_app: Flask) -> None:
-    """Initialize instruments for the Flask app."""
     Psycopg2Instrumentor().instrument(skip_dep_check=True)
-    logger.info("Tracing initialized for the Flask DB.")
+    logger.info("Tracing initialized for the DB.")
 
     PikaInstrumentor().instrument()
-    logger.info("Tracing initialized for Rabbitmq withing Flask app.")
+    logger.info("Tracing initialized for the Rabbitmq.")
+
+
+def initialize_tracing_for_flask_app(
+    flask_app: Flask,
+    service_name: str,
+) -> None:
+    """Initialize tracing for the Flask app."""
+    _initialize_tracing(service_name)
 
     FlaskInstrumentor().instrument_app(flask_app)
     logger.info("Tracing initialized for Flask app.")
 
 
-def init_instruments_for_celery_app() -> None:
-    """Initialize instruments for the Celery app."""
-    Psycopg2Instrumentor().instrument(skip_dep_check=True)
-    logger.info("Tracing initialized for the DB within Celery app.")
-
-    PikaInstrumentor().instrument()
-    logger.info("Tracing initialized for Rabbitmq withing Celery app.")
+def initialize_tracing_for_celery_app(service_name: str) -> None:
+    """Initialize tracing for the Celery app."""
+    _initialize_tracing(service_name)
 
     CeleryInstrumentor()
     logger.info("Tracing initialized for Celery app.")
