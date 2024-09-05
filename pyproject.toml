@@ -35,6 +35,11 @@ opentelemetry-instrumentation-psycopg2 = "^0.48b0"
 opentelemetry-instrumentation-celery = "^0.48b0"
 opentelemetry-instrumentation-pika = "^0.48b0"
 
+
+[tool.poetry.group.metrics.dependencies]
+celery-prometheus = "^1.1.0"
+prometheus-flask-exporter = "^0.23.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -43,7 +48,11 @@ build-backend = "poetry.core.masonry.api"
 lint.select = ["ALL"]
 line-length = 79
 lint.ignore = ["D203", "D213", "TCH002", "I001"]
-exclude = ["src/infrastructure/persistence/migrations/", "tests/"]
+exclude = [
+  "src/infrastructure/persistence/migrations/",
+  "tests/",
+  "prometheus/",
+]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 5

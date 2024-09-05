@@ -20,6 +20,8 @@ TARGET_CURRENCY = env.str("TARGET_CURENCY", "EUR")
 JAEGER_AGENT_HOST = env.str("JAEGER_AGENT_HOST", "transaction-jaeger")
 JAEGER_AGENT_PORT = env.int("JAEGER_AGENT_PORT", 6831)
 
-IS_TRACING_ON = env.str("FLASK_ENV", "development") == "development"
-
 RABBITMQ_URL = env.str("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672//")
+
+IS_TRACING_ON = env.bool("IS_TRACING_ON", True)
+
+IS_METRICS_MONITORING_ON = True

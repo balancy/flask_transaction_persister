@@ -2,7 +2,7 @@
 
 from celery import Celery
 
-from config import IS_TRACING_ON, RABBITMQ_URL
+from config import IS_METRICS_MONITORING_ON, IS_TRACING_ON, RABBITMQ_URL
 
 if IS_TRACING_ON:
     from utils.tracing import initialize_tracing_for_celery_app
@@ -22,3 +22,8 @@ celery_app.conf.update(
 
 
 from tasks import process_transaction  # noqa: E402, F401
+
+if IS_METRICS_MONITORING_ON:
+    from celery_prometheus import add_prometheus_option
+
+    add_prometheus_option(celery_app)

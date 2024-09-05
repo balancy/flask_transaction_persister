@@ -8,9 +8,7 @@ services:
       - JAEGER_AGENT_HOST=jaeger
     volumes:
       - ./src:/app/src
-    depends_on:
-      - jaeger
-    entrypoint: ["sh", "-c", "./entrypoint.sh flask run --reload"]
+    entrypoint: ["sh", "-c", "./entrypoint.sh flask run"]
 
   worker:
     build:
@@ -19,16 +17,5 @@ services:
     environment:
       - FLASK_ENV=development
       - JAEGER_AGENT_HOST=jaeger
-    depends_on:
-      - jaeger
     volumes:
       - ./src:/app/src
-
-  jaeger:
-    image: jaegertracing/all-in-one:1.46
-    container_name: transaction-jaeger
-    ports:
-      - "6831:6831/udp"  # Jaeger agent port
-      - "16686:16686"  # Jaeger UI port
-    environment:
-      - COLLECTOR_ZIPKIN_HTTP_PORT=9411  # Enables Zipkin format traces
