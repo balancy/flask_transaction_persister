@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from typing import overload
+
+from flask_sqlalchemy.session import Session
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
 
 from domain.models import IncomingTransaction, ProcessedTransaction
-from infrastructure.persistence.db import session_dependency
+from infrastructure.persistence.extensions import db
 from infrastructure.persistence.models import (
     IncomingTransactionModel,
     ProcessedTransactionModel,
@@ -18,9 +20,23 @@ from utils.exceptions import TransactionIntegrityError
 class TransactionRepository:
     """Repository class for handling database operations."""
 
-    def __init__(self, db: Session | None = None) -> None:
+    def __init__(self, db_session: Session | None = None) -> None:
         """Initialize repository with the database session."""
-        self.db = db or session_dependency()
+        self.db = db_session or db.session
+
+    @overload
+    def _save(
+        self,
+        transaction_data: IncomingTransaction,
+        model: type[IncomingTransactionModel],
+    ) -> IncomingTransactionModel: ...
+
+    @overload
+    def _save(
+        self,
+        transaction_data: ProcessedTransaction,
+        model: type[ProcessedTransactionModel],
+    ) -> ProcessedTransactionModel: ...
 
     def _save(
         self,

@@ -4,7 +4,11 @@ from flask import Flask
 from flask_injector import FlaskInjector
 
 from config import IS_METRICS_MONITORING_ON, IS_TRACING_ON
-from dependencies import configure_dependencies_for_app
+from dependencies import (
+    configure_extra_dependencies_for_app,
+    configure_persistence_dependencies_for_app,
+)
+from infrastructure.persistence.setup import init_db
 from presentation.routes import routes_blueprint
 
 if IS_METRICS_MONITORING_ON:
@@ -14,7 +18,22 @@ if IS_METRICS_MONITORING_ON:
 def create_app() -> Flask:
     """Create the Flask app."""
     app = Flask(__name__)
+    # init_db(app)
+    FlaskInjector(
+        app=app, modules=[configure_persistence_dependencies_for_app]
+    )
+
+    # routes
     app.register_blueprint(routes_blueprint)
+
+    # dependency injection
+    FlaskInjector(
+        app=app,
+        modules=[
+            # configure_persistence_dependencies_for_app,
+            configure_extra_dependencies_for_app,
+        ],
+    )
 
     # tracing
     if IS_TRACING_ON:
@@ -27,9 +46,6 @@ def create_app() -> Flask:
         metrics = PrometheusMetrics(app)
 
         metrics.info("flask_app", "Transaction persister", version="0.1")
-
-    # dependency injection
-    FlaskInjector(app=app, modules=[configure_dependencies_for_app])
 
     return app
 

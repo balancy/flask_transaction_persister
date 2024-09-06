@@ -1,33 +1,30 @@
 """App database models."""
 
-from sqlalchemy import Column, DateTime, Float, String
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from infrastructure.persistence.extensions import db
 
 
-class IncomingTransactionModel(Base):
+class IncomingTransactionModel(db.Model):
     """Incoming transaction model."""
 
     __tablename__ = "incoming_transactions"
 
-    transaction_id = Column(String, primary_key=True, index=True)
-    user_id = Column(String, index=True)
-    amount = Column(Float)
-    currency = Column(String)
-    timestamp = Column(DateTime)
+    transaction_id = db.Column(db.String, primary_key=True, index=True)
+    user_id = db.Column(db.String, index=True)
+    amount = db.Column(db.Float)
+    currency = db.Column(db.String)
+    timestamp = db.Column(db.DateTime)
 
 
-class ProcessedTransactionModel(Base):
+class ProcessedTransactionModel(db.Model):
     """Processed transaction model."""
 
     __tablename__ = "transactions"
 
-    transaction_id = Column(String, primary_key=True, index=True)
-    user_id = Column(String, index=True)
-    original_amount = Column(Float)
-    original_currency = Column(String)
-    converted_amount = Column(Float)
-    target_currency = Column(String)
-    exchange_rate = Column(Float)
-    timestamp = Column(DateTime)
+    transaction_id = db.Column(db.String, primary_key=True, index=True)
+    user_id = db.Column(db.String, index=True)
+    original_amount = db.Column(db.Float)
+    original_currency = db.Column(db.String)
+    converted_amount = db.Column(db.Float)
+    target_currency = db.Column(db.String)
+    exchange_rate = db.Column(db.Float)
+    timestamp = db.Column(db.DateTime)

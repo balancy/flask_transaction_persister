@@ -11,8 +11,8 @@ from application.services.processing_services import (
     EnqueuedTransactionProcessingService,
 )
 from domain.models import IncomingTransaction
-from src.utils.context_managers import conditional_trace_context
 from utils.app_logger import logger
+from utils.context_managers import conditional_trace_context
 from utils.exceptions import TransactionIntegrityError
 
 

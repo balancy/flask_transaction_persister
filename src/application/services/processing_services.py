@@ -5,10 +5,10 @@ from __future__ import annotations
 from injector import inject
 
 from application.services.exchange_rates_service import ExchangeRatesService
+from config import TARGET_CURRENCY
 from domain.models import IncomingTransaction, ProcessedTransaction
-from infrastructure.messaging.queue_client import QueueClient
+from infrastructure.messaging_queue_client import QueueClient
 from infrastructure.persistence.repositories import TransactionRepository
-from src.config import TARGET_CURRENCY
 from utils.app_logger import logger
 
 

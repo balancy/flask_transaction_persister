@@ -2,7 +2,7 @@
 
 from injector import inject
 
-from infrastructure.external_api.clients import ExternalExchangeRatesClient
+from infrastructure.external_api_client import ExternalExchangeRatesClient
 
 
 class ExchangeRatesService:
