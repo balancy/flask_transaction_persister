@@ -33,6 +33,7 @@ COPY grafana/provisioning  /etc/grafana/provisioning
 ENV PYTHONPATH=/app/src
 ENV FLASK_APP=src/app.py
 ENV FLASK_ENV=development
+ENV FLASK_RUN_HOST=0.0.0.0
 ENV PROMETHEUS_MULTIPROC_DIR=/var/cache/celery_prometheus
 
 RUN mkdir -p $PROMETHEUS_MULTIPROC_DIR

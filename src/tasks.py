@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 from celery import shared_task
-from injector import Injector
 from pydantic import ValidationError
 
 from application.schemas import IncomingTransactionSchema
 from application.services.processing_services import (
     EnqueuedTransactionProcessingService,
 )
+from dependencies import celery_injector
 from domain.models import IncomingTransaction
-from src.utils.context_managers import conditional_trace_context
 from utils.app_logger import logger
+from utils.context_managers import conditional_trace_context
 from utils.exceptions import TransactionIntegrityError
 
 
@@ -35,7 +35,9 @@ def process_transaction(
         raise
 
     transaction = IncomingTransaction.from_dict(transaction_data)
-    transaction_service = Injector().get(EnqueuedTransactionProcessingService)
+    transaction_service = celery_injector.get(
+        EnqueuedTransactionProcessingService,
+    )
 
     try:
         with conditional_trace_context(__name__, "process_transaction"):

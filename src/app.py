@@ -4,7 +4,7 @@ from flask import Flask
 from flask_injector import FlaskInjector
 
 from config import IS_METRICS_MONITORING_ON, IS_TRACING_ON
-from dependencies import configure_dependencies_for_app
+from dependencies import configure_dependencies_for_web_app
 from presentation.routes import routes_blueprint
 
 if IS_METRICS_MONITORING_ON:
@@ -29,7 +29,7 @@ def create_app() -> Flask:
         metrics.info("flask_app", "Transaction persister", version="0.1")
 
     # dependency injection
-    FlaskInjector(app=app, modules=[configure_dependencies_for_app])
+    FlaskInjector(app=app, modules=[configure_dependencies_for_web_app])
 
     return app
 
