@@ -16,7 +16,9 @@ def external_api_client() -> ExternalExchangeRatesClient:
 
 
 @responses.activate
-def test_get_rate_success(external_api_client) -> None:
+def test_get_rate_success(
+    external_api_client: ExternalExchangeRatesClient,
+) -> None:
     """Test get_rate method for successful response."""
     from_currency = "USD"
     to_currency = "EUR"
@@ -34,7 +36,9 @@ def test_get_rate_success(external_api_client) -> None:
 
 
 @responses.activate
-def test_get_rate_failure(external_api_client) -> None:
+def test_get_rate_failure(
+    external_api_client: ExternalExchangeRatesClient,
+) -> None:
     """Test get_rate method for failed response."""
     from_currency = "USD"
     to_currency = "EUR"
@@ -51,7 +55,9 @@ def test_get_rate_failure(external_api_client) -> None:
 
 
 @responses.activate
-def test_get_rate_default(external_api_client) -> None:
+def test_get_rate_default(
+    external_api_client: ExternalExchangeRatesClient,
+) -> None:
     """Test get_rate method for default rate."""
     from_currency = "USD"
     to_currency = "NON_EXISTENT_CURRENCY"

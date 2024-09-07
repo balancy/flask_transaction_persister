@@ -1,5 +1,7 @@
 """Tests for QueueClient class."""
 
+from __future__ import annotations
+
 import json
 import uuid
 from unittest.mock import Mock, patch
@@ -16,7 +18,7 @@ def queue_client() -> QueueClient:
 
 
 @pytest.fixture
-def mock_pika(mocker) -> tuple[Mock, Mock]:
+def mock_pika(mocker: Mock) -> tuple[Mock, Mock]:
     """Fixture for mocking pika library."""
     mock_connection = Mock()
     mock_channel = Mock()
@@ -25,7 +27,10 @@ def mock_pika(mocker) -> tuple[Mock, Mock]:
     return mock_connection, mock_channel
 
 
-def test_send_transaction_to_queue(mock_pika, queue_client) -> None:
+def test_send_transaction_to_queue(
+    mock_pika: Mock,
+    queue_client: QueueClient,
+) -> None:
     """Test send_transaction_to_queue method."""
     _, mock_channel = mock_pika
     transaction_data = {"amount": 100, "currency": "USD"}
@@ -47,7 +52,10 @@ def test_send_transaction_to_queue(mock_pika, queue_client) -> None:
     assert sent_message == expected_message
 
 
-def test_close_connection(mock_pika, queue_client) -> None:
+def test_close_connection(
+    mock_pika: Mock,
+    queue_client: QueueClient,
+) -> None:
     """Test close_connection method."""
     _, _ = mock_pika
 

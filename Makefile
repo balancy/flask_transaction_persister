@@ -12,3 +12,6 @@ stop:
 lint:
 	@ruff check src
 	@black --check src
+
+test:
+	@pytest
