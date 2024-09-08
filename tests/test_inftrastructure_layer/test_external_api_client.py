@@ -7,6 +7,7 @@ import requests
 import responses
 
 from infrastructure.external_api.clients import ExternalExchangeRatesClient
+from utils.exceptions import FailedToFetchExchangeRateError
 
 
 @pytest.fixture
@@ -50,7 +51,7 @@ def test_get_rate_failure(
         status=HTTPStatus.INTERNAL_SERVER_ERROR,
     )
 
-    with pytest.raises(ConnectionError):
+    with pytest.raises(FailedToFetchExchangeRateError):
         external_api_client.get_rate(from_currency, to_currency)
 
 

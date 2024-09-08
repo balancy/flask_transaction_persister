@@ -8,13 +8,15 @@ from flask import Blueprint, Response, jsonify, request
 from pydantic import ValidationError
 
 from application.schemas import IncomingTransactionSchema
-from application.services.processing_services import (
-    IncomingTransactionProcessingService,
-)
 from domain.models import IncomingTransaction
+from domain.protocols import ProcessingServiceProtocol
 from utils.app_logger import logger
 from utils.context_managers import conditional_trace_context
-from utils.exceptions import TransactionIntegrityError
+from utils.exceptions import (
+    FailedToFetchExchangeRateError,
+    FailedToPublishMessageError,
+    TransactionIntegrityError,
+)
 
 routes_blueprint = Blueprint("transaction", __name__)
 
@@ -27,7 +29,7 @@ def index() -> tuple[Response, HTTPStatus]:
 
 @routes_blueprint.route("/transaction", methods=["POST"])
 def post_transaction(
-    transaction_service: IncomingTransactionProcessingService,
+    transaction_service: ProcessingServiceProtocol,
 ) -> tuple[Response, HTTPStatus]:
     """Post transaction data to the server."""
     raw_data = request.get_json()
@@ -52,7 +54,11 @@ def post_transaction(
     try:
         with conditional_trace_context(__name__, "process_transaction"):
             result = transaction_service.process_transaction(transaction)
-    except TransactionIntegrityError as ex:
+    except (
+        TransactionIntegrityError,
+        FailedToPublishMessageError,
+        FailedToFetchExchangeRateError,
+    ) as ex:
         logger.error(str(ex))
         return jsonify({"error": str(ex)}), HTTPStatus.CONFLICT
 

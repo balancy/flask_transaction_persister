@@ -2,14 +2,14 @@
 
 from injector import inject
 
-from infrastructure.external_api.clients import ExternalExchangeRatesClient
+from application.protocols import ExchangeRatesClientProtocol
 
 
 class ExchangeRatesService:
     """Class for exchange rates service."""
 
     @inject
-    def __init__(self, external_client: ExternalExchangeRatesClient) -> None:
+    def __init__(self, external_client: ExchangeRatesClientProtocol) -> None:
         """Initialize service."""
         self.external_client = external_client
 

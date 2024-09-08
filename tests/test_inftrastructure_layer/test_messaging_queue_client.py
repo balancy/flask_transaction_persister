@@ -7,8 +7,10 @@ import uuid
 from unittest.mock import Mock, patch
 
 import pytest
+from pika.exceptions import AMQPConnectionError
 
 from infrastructure.messaging.queue_client import QueueClient
+from utils.exceptions import FailedToPublishMessageError
 
 
 @pytest.fixture
@@ -27,7 +29,7 @@ def mock_pika(mocker: Mock) -> tuple[Mock, Mock]:
     return mock_connection, mock_channel
 
 
-def test_send_transaction_to_queue(
+def test_send_transaction_to_queue_passes_successfully(
     mock_pika: Mock,
     queue_client: QueueClient,
 ) -> None:
@@ -50,6 +52,22 @@ def test_send_transaction_to_queue(
 
     assert mock_channel.basic_publish.call_count == 1
     assert sent_message == expected_message
+
+
+def test_send_transaction_to_queue_raises_error(
+    mock_pika: Mock,
+    queue_client: QueueClient,
+) -> None:
+    """Test send_transaction_to_queue method raises error on failure."""
+    _, mock_channel = mock_pika
+    transaction_data = {"amount": 100, "currency": "USD"}
+
+    with patch.object(
+        mock_channel,
+        "basic_publish",
+        side_effect=AMQPConnectionError,
+    ), pytest.raises(FailedToPublishMessageError):
+        queue_client.send_transaction_to_queue(transaction_data)
 
 
 def test_close_connection(

@@ -7,8 +7,10 @@ import uuid
 from typing import Any
 
 import pika
+from pika.exceptions import AMQPConnectionError
 
 from utils.context_managers import conditional_trace_context
+from utils.exceptions import FailedToPublishMessageError
 
 
 class QueueClient:
@@ -41,17 +43,20 @@ class QueueClient:
             "eta": None,
         }
 
-        with conditional_trace_context(__name__, "enquque_transaction"):
-            self.channel.basic_publish(
-                exchange="",
-                routing_key=self.queue_name,
-                body=json.dumps(message),
-                properties=pika.BasicProperties(
-                    delivery_mode=2,  # Make message persistent
-                    content_encoding="utf-8",
-                    content_type="application/json",
-                ),
-            )
+        try:
+            with conditional_trace_context(__name__, "enquque_transaction"):
+                self.channel.basic_publish(
+                    exchange="",
+                    routing_key=self.queue_name,
+                    body=json.dumps(message),
+                    properties=pika.BasicProperties(
+                        delivery_mode=2,  # Make message persistent
+                        content_encoding="utf-8",
+                        content_type="application/json",
+                    ),
+                )
+        except AMQPConnectionError:
+            raise FailedToPublishMessageError from None
 
     def close_connection(self) -> None:
         """Close RabbitMQ connection."""

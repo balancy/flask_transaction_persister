@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import logging  # noqa: TCH003
+
 from injector import inject
 
-from application.services.exchange_rates_service import ExchangeRatesService
+from application.protocols import (
+    QueueClientProtocol,
+    TransactionRepositoryProtocol,
+)
 from config import TARGET_CURRENCY
 from domain.models import IncomingTransaction, ProcessedTransaction
-from infrastructure.messaging.queue_client import QueueClient
-from infrastructure.persistence.repositories import TransactionRepository
-from utils.app_logger import logger
+from domain.protocols import ExchangeRatesServiceProtocol
 
 
 class IncomingTransactionProcessingService:
@@ -18,25 +21,27 @@ class IncomingTransactionProcessingService:
     @inject
     def __init__(
         self,
-        queue_client: QueueClient,
-        repo: TransactionRepository,
+        queue_client: QueueClientProtocol,
+        repo: TransactionRepositoryProtocol,
+        logger: logging.Logger,
     ) -> None:
         """Initialize service."""
         self.queue_client = queue_client
         self.repo = repo
+        self.logger = logger
 
     def process_transaction(
         self,
         transaction_data: IncomingTransaction,
     ) -> dict[str, str]:
         """Process transaction."""
-        logger.info(
+        self.logger.info(
             "Processing incoming transaction %s",
             transaction_data.transaction_id,
         )
 
         self.repo.save_incoming_transaction(transaction_data)
-        logger.info(
+        self.logger.info(
             "Incoming transaction %s saved successfully",
             transaction_data.transaction_id,
         )
@@ -44,7 +49,7 @@ class IncomingTransactionProcessingService:
         self.queue_client.send_transaction_to_queue(
             transaction_data.to_dict(),
         )
-        logger.info(
+        self.logger.info(
             "Incoming transaction %s enqueued successfully",
             transaction_data.transaction_id,
         )
@@ -63,19 +68,21 @@ class EnqueuedTransactionProcessingService:
     @inject
     def __init__(
         self,
-        repo: TransactionRepository,
-        exchange_service: ExchangeRatesService,
+        repo: TransactionRepositoryProtocol,
+        exchange_service: ExchangeRatesServiceProtocol,
+        logger: logging.Logger,
     ) -> None:
         """Initialize service."""
         self.repo = repo
         self.exchange_service = exchange_service
+        self.logger = logger
 
     def process_transaction(
         self,
         transaction_data: IncomingTransaction,
     ) -> dict[str, str]:
         """Process transaction."""
-        logger.info(
+        self.logger.info(
             "Processing dequeued transaction %s",
             transaction_data.transaction_id,
         )
@@ -102,6 +109,6 @@ class EnqueuedTransactionProcessingService:
 
         transaction_id = transaction_data.transaction_id
         message = f"Transaction {transaction_id} saved successfully"
-        logger.info(message)
+        self.logger.info(message)
 
         return {"status": message}

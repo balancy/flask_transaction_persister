@@ -11,3 +11,8 @@ repos:
         entry: black --check src
         language: system
         pass_filenames: false
+      - id: backend-test
+        name: Run tests for backend
+        entry: pytest
+        language: system
+        pass_filenames: false
