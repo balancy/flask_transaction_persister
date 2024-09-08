@@ -13,13 +13,13 @@ from infrastructure.messaging.queue_client import QueueClient
 from utils.exceptions import FailedToPublishMessageError
 
 
-@pytest.fixture
+@pytest.fixture()
 def queue_client() -> QueueClient:
     """Fixture for QueueClient."""
     return QueueClient()
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_pika(mocker: Mock) -> tuple[Mock, Mock]:
     """Fixture for mocking pika library."""
     mock_connection = Mock()

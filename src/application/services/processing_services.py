@@ -7,12 +7,12 @@ import logging  # noqa: TCH003
 from injector import inject
 
 from application.protocols import (
+    ExchangeRatesClientProtocol,
     QueueClientProtocol,
     TransactionRepositoryProtocol,
 )
 from config import TARGET_CURRENCY
 from domain.models import IncomingTransaction, ProcessedTransaction
-from domain.protocols import ExchangeRatesServiceProtocol
 
 
 class IncomingTransactionProcessingService:
@@ -69,12 +69,12 @@ class EnqueuedTransactionProcessingService:
     def __init__(
         self,
         repo: TransactionRepositoryProtocol,
-        exchange_service: ExchangeRatesServiceProtocol,
+        exchange_rates_client: ExchangeRatesClientProtocol,
         logger: logging.Logger,
     ) -> None:
         """Initialize service."""
         self.repo = repo
-        self.exchange_service = exchange_service
+        self.exchange_rates_client = exchange_rates_client
         self.logger = logger
 
     def process_transaction(
@@ -87,7 +87,7 @@ class EnqueuedTransactionProcessingService:
             transaction_data.transaction_id,
         )
 
-        rate: float = self.exchange_service.get_rate(
+        rate: float = self.exchange_rates_client.get_rate(
             from_currency=transaction_data.currency,
             to_currency=TARGET_CURRENCY,
         )

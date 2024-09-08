@@ -16,11 +16,3 @@ class ProcessingServiceProtocol(Protocol):
     ) -> dict[str, str]:
         """Process transaction."""
         ...
-
-
-class ExchangeRatesServiceProtocol(Protocol):
-    """Protocol for exchange rates service, defining expected methods."""
-
-    def get_rate(self, from_currency: str, to_currency: str) -> float:
-        """Get the exchange rate between two currencies."""
-        ...

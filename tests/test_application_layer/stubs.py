@@ -1,4 +1,4 @@
-"""Module with stubs for transaction processing services."""
+"""Module with stubs for application stubs."""
 
 from __future__ import annotations
 
@@ -28,6 +28,9 @@ class QueueClientStub:
     ) -> None:
         """Stub implementation of send_transaction_to_queue."""
         assert transaction_data == CORRECT_INCOMING_TRANSACTION.to_dict()
+
+    def close_connection(self) -> None:
+        """Stub implementation of close_connection."""
 
 
 class TransactionRepositoryStub:
@@ -59,8 +62,8 @@ class TransactionRepositoryStub:
         assert transaction_data == correct_processed_transaction
 
 
-class ExchangeRatesServiceStub:
-    """A stub implementation of the ExchangeRatesServiceProtocol."""
+class ExternalExchangeRatesClientStub:
+    """A stub implementation of the ExchangeRatesClientProtocol."""
 
     def get_rate(self, from_currency: str, to_currency: str) -> float:
         """Stub implementation of get_rate."""

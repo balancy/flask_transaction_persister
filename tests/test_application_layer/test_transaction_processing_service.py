@@ -8,15 +8,15 @@ from application.services.processing_services import (
 )
 from tests.stubs import NoOpLogger
 
-from .stubs.for_transaction_processing_services import (
+from .stubs import (
     CORRECT_INCOMING_TRANSACTION,
-    ExchangeRatesServiceStub,
+    ExternalExchangeRatesClientStub,
     QueueClientStub,
     TransactionRepositoryStub,
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def incoming_transaction_service() -> IncomingTransactionProcessingService:
     """Fixture for incoming transaction processing service."""
     queue_client_stub = QueueClientStub()
@@ -24,19 +24,19 @@ def incoming_transaction_service() -> IncomingTransactionProcessingService:
     return IncomingTransactionProcessingService(
         queue_client=queue_client_stub,
         repo=transaction_repo_stub,
-        logger=NoOpLogger(),
+        logger=NoOpLogger("test"),
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def enqueued_transaction_service() -> EnqueuedTransactionProcessingService:
     """Fixture for enqueued transaction processing service."""
-    exchange_rates_service_stub = ExchangeRatesServiceStub()
+    exchange_rates_client_stub = ExternalExchangeRatesClientStub()
     transaction_repo_stub = TransactionRepositoryStub()
     return EnqueuedTransactionProcessingService(
-        exchange_service=exchange_rates_service_stub,
+        exchange_rates_client=exchange_rates_client_stub,
         repo=transaction_repo_stub,
-        logger=NoOpLogger(),
+        logger=NoOpLogger("test"),
     )
 
 

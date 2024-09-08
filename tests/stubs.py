@@ -1,7 +1,9 @@
 """Common stubs for all tests."""
 
+from logging import Logger
 
-class NoOpLogger:
+
+class NoOpLogger(Logger):
     """A logger that does nothing."""
 
     def info(self, *args: str, **kwargs: str) -> None:

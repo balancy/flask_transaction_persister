@@ -6,3 +6,5 @@ Dockerfile
 Makefile
 *.rest
 .coverage
+.env
+.vscode

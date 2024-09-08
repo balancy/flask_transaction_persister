@@ -9,15 +9,11 @@ from application.protocols import (
     QueueClientProtocol,
     TransactionRepositoryProtocol,
 )
-from application.services.exchange_rates_service import ExchangeRatesService
 from application.services.processing_services import (
     EnqueuedTransactionProcessingService,
     IncomingTransactionProcessingService,
 )
-from domain.protocols import (
-    ExchangeRatesServiceProtocol,
-    ProcessingServiceProtocol,
-)
+from domain.protocols import ProcessingServiceProtocol
 from infrastructure.external_api.clients import ExternalExchangeRatesClient
 from infrastructure.messaging.queue_client import QueueClient
 from infrastructure.persistence.repositories import TransactionRepository
@@ -53,11 +49,6 @@ def configure_dependencies_for_celery_app(binder: Binder) -> None:
     binder.bind(
         TransactionRepositoryProtocol,
         to=TransactionRepository,
-        scope=singleton,
-    )
-    binder.bind(
-        ExchangeRatesServiceProtocol,
-        to=ExchangeRatesService,
         scope=singleton,
     )
     binder.bind(

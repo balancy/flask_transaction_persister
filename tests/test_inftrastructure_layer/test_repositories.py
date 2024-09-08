@@ -15,7 +15,7 @@ from infrastructure.persistence.repositories import TransactionRepository
 from utils.exceptions import TransactionIntegrityError
 
 
-@pytest.fixture
+@pytest.fixture()
 def db_session(postgresql: connection) -> Generator[Session, Any, None]:
     """Fixture that sets up a database session for testing."""
     conn_info = postgresql.info
@@ -38,13 +38,13 @@ def db_session(postgresql: connection) -> Generator[Session, Any, None]:
     engine.dispose()
 
 
-@pytest.fixture
+@pytest.fixture()
 def transaction_repository(db_session: Session) -> TransactionRepository:
     """Fixture that provides a TransactionRepository."""
     return TransactionRepository(db=db_session)
 
 
-@pytest.fixture
+@pytest.fixture()
 def incoming_transaction() -> IncomingTransaction:
     """Fixture for IncomingTransaction."""
     return IncomingTransaction(
@@ -56,7 +56,7 @@ def incoming_transaction() -> IncomingTransaction:
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def processed_transaction() -> ProcessedTransaction:
     """Fixture for ProcessedTransaction."""
     return ProcessedTransaction(
