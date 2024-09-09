@@ -15,4 +15,4 @@ class ProcessingServiceProtocol(Protocol):
         transaction_data: IncomingTransaction,
     ) -> dict[str, str]:
         """Process transaction."""
-        ...
+        ...  # pragma: no cover
