@@ -1,5 +1,9 @@
 """Tests for transaction processing service logic."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pytest
 
 from application.services.processing_services import (
@@ -8,34 +12,38 @@ from application.services.processing_services import (
 )
 from tests.stubs import NoOpLogger
 
-from .stubs import (
-    CORRECT_INCOMING_TRANSACTION,
-    ExternalExchangeRatesClientStub,
-    QueueClientStub,
-    TransactionRepositoryStub,
-)
+from .stubs import CORRECT_INCOMING_TRANSACTION
+
+if TYPE_CHECKING:
+    from .stubs import (
+        ExternalExchangeRatesClientStub,
+        QueueClientStub,
+        TransactionRepositoryStub,
+    )
 
 
 @pytest.fixture
-def incoming_transaction_service() -> IncomingTransactionProcessingService:
+def incoming_transaction_service(
+    queue_client_stub: QueueClientStub,
+    transaction_repository_stub: TransactionRepositoryStub,
+) -> IncomingTransactionProcessingService:
     """Fixture for incoming transaction processing service."""
-    queue_client_stub = QueueClientStub()
-    transaction_repo_stub = TransactionRepositoryStub()
     return IncomingTransactionProcessingService(
         queue_client=queue_client_stub,
-        repo=transaction_repo_stub,
+        repo=transaction_repository_stub,
         logger=NoOpLogger("test"),
     )
 
 
 @pytest.fixture
-def enqueued_transaction_service() -> EnqueuedTransactionProcessingService:
+def enqueued_transaction_service(
+    external_exchange_rates_client_stub: ExternalExchangeRatesClientStub,
+    transaction_repository_stub: TransactionRepositoryStub,
+) -> EnqueuedTransactionProcessingService:
     """Fixture for enqueued transaction processing service."""
-    exchange_rates_client_stub = ExternalExchangeRatesClientStub()
-    transaction_repo_stub = TransactionRepositoryStub()
     return EnqueuedTransactionProcessingService(
-        exchange_rates_client=exchange_rates_client_stub,
-        repo=transaction_repo_stub,
+        exchange_rates_client=external_exchange_rates_client_stub,
+        repo=transaction_repository_stub,
         logger=NoOpLogger("test"),
     )
 

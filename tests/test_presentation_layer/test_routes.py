@@ -1,8 +1,12 @@
 """Module containing tests for routes module."""
 
-from http import HTTPStatus
+from __future__ import annotations
 
-from flask.testing import FlaskClient
+from http import HTTPStatus
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from flask.testing import FlaskClient
 
 
 ENDPOINT = "/transaction"
