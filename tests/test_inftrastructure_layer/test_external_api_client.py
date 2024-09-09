@@ -10,7 +10,7 @@ from infrastructure.external_api.clients import ExternalExchangeRatesClient
 from utils.exceptions import FailedToFetchExchangeRateError
 
 
-@pytest.fixture()
+@pytest.fixture
 def external_api_client() -> ExternalExchangeRatesClient:
     """Fixture for ExternalExchangeRatesClient."""
     return ExternalExchangeRatesClient()

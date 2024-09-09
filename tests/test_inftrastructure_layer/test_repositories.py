@@ -4,8 +4,7 @@ from datetime import datetime
 from typing import Any, Generator
 
 import pytest
-from psycopg2.extensions import connection
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm.session import Session
 
@@ -14,37 +13,66 @@ from infrastructure.persistence.models import Base
 from infrastructure.persistence.repositories import TransactionRepository
 from utils.exceptions import TransactionIntegrityError
 
+TEST_DATABASE_URL = "postgresql+psycopg2://username:password@db:5432/test_db"
 
-@pytest.fixture()
-def db_session(postgresql: connection) -> Generator[Session, Any, None]:
-    """Fixture that sets up a database session for testing."""
-    conn_info = postgresql.info
-    db_url = (
-        f"postgresql+psycopg2://{conn_info.user}:{conn_info.password}"
-        f"@{conn_info.host}:{conn_info.port}/{conn_info.dbname}"
-    )
-    engine = create_engine(url=db_url)
 
+def create_test_database() -> None:
+    """Create the test database if it does not exist."""
+    host, db_name = TEST_DATABASE_URL.rsplit("/", 1)
+    base_engine = create_engine(host + "/postgres", echo=False)
+
+    with base_engine.connect() as conn:
+        result = conn.execute(
+            text("SELECT 1 FROM pg_database WHERE datname = :db_name"),
+            {"db_name": db_name},
+        ).scalar()
+
+        if not result:
+            conn.execute(text("CREATE DATABASE test_db"))
+    base_engine.dispose()
+
+
+@pytest.fixture(scope="session")
+def engine() -> Generator[Engine, None, None]:
+    """Set up the test database and ensure schema is created."""
+    create_test_database()
+
+    engine = create_engine(TEST_DATABASE_URL, echo=True)
     Base.metadata.create_all(engine)
 
-    session_factory = scoped_session(sessionmaker(bind=engine))
+    yield engine
+
+    Base.metadata.drop_all(engine)
+    engine.dispose()
+
+
+@pytest.fixture
+def db_session(
+    engine: Engine,
+) -> Generator[Session, Any, None]:
+    """Fixture that sets up a database session for testing."""
+    connection = engine.connect()
+    session_factory = scoped_session(sessionmaker(bind=connection))
     session = session_factory()
 
     yield session
 
-    session.rollback()
+    for table in reversed(Base.metadata.sorted_tables):
+        session.execute(text(f"TRUNCATE TABLE {table.name};"))
+
+    session.commit()
     session.close()
     session_factory.remove()
     engine.dispose()
 
 
-@pytest.fixture()
+@pytest.fixture
 def transaction_repository(db_session: Session) -> TransactionRepository:
     """Fixture that provides a TransactionRepository."""
     return TransactionRepository(db=db_session)
 
 
-@pytest.fixture()
+@pytest.fixture
 def incoming_transaction() -> IncomingTransaction:
     """Fixture for IncomingTransaction."""
     return IncomingTransaction(
@@ -56,7 +84,7 @@ def incoming_transaction() -> IncomingTransaction:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def processed_transaction() -> ProcessedTransaction:
     """Fixture for ProcessedTransaction."""
     return ProcessedTransaction(

@@ -16,7 +16,7 @@ from .stubs import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def incoming_transaction_service() -> IncomingTransactionProcessingService:
     """Fixture for incoming transaction processing service."""
     queue_client_stub = QueueClientStub()
@@ -28,7 +28,7 @@ def incoming_transaction_service() -> IncomingTransactionProcessingService:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def enqueued_transaction_service() -> EnqueuedTransactionProcessingService:
     """Fixture for enqueued transaction processing service."""
     exchange_rates_client_stub = ExternalExchangeRatesClientStub()

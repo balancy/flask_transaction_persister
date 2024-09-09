@@ -3,7 +3,7 @@ repos:
     hooks:
       - id: backend-ruff
         name: Run ruff for backend
-        entry: ruff check src
+        entry: ruff check .
         language: system
         pass_filenames: false
       - id: backend-black-check
@@ -13,6 +13,6 @@ repos:
         pass_filenames: false
       - id: backend-test
         name: Run tests for backend
-        entry: pytest
+        entry: make test
         language: system
         pass_filenames: false

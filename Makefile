@@ -10,8 +10,8 @@ stop:
 	@docker compose down
 
 lint:
-	@ruff check src
+	@ruff check .
 	@black --check src
 
 test:
-	@pytest
+	@docker exec transaction-app pytest -v
