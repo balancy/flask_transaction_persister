@@ -8,6 +8,7 @@ services:
       - JAEGER_AGENT_HOST=jaeger
     volumes:
       - ./src:/app/src
+      - ./tests:/app/tests
     entrypoint: ["sh", "-c", "./entrypoint.sh flask run"]
 
   worker:

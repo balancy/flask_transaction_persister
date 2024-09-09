@@ -14,4 +14,4 @@ lint:
 	@black --check src
 
 test:
-	@docker exec transaction-app pytest -v
+	@docker exec transaction-app pytest

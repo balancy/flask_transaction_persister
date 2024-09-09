@@ -26,7 +26,7 @@ COPY --from=dev-builder /usr/local/lib/python3.12/site-packages /usr/local/lib/p
 COPY --from=dev-builder /usr/local/bin /usr/local/bin
 
 COPY src /app/src
-COPY wait-for-it.sh entrypoint.sh alembic.ini /app/
+COPY wait-for-it.sh entrypoint.sh alembic.ini pyproject.toml /app/
 
 COPY prometheus/prometheus.yml /etc/prometheus/prometheus.yml
 COPY grafana/provisioning  /etc/grafana/provisioning
