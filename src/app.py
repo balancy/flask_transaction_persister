@@ -7,7 +7,7 @@ from config import IS_METRICS_MONITORING_ON, IS_TRACING_ON
 from dependencies import configure_dependencies_for_web_app
 from presentation.routes import routes_blueprint
 
-if IS_METRICS_MONITORING_ON:
+if IS_METRICS_MONITORING_ON:  # pragma: no cover
     from prometheus_flask_exporter import PrometheusMetrics
 
 
@@ -32,8 +32,3 @@ def create_app() -> Flask:
     FlaskInjector(app=app, modules=[configure_dependencies_for_web_app])
 
     return app
-
-
-if __name__ == "__main__":
-    app = create_app()
-    app.run()
