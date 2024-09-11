@@ -15,7 +15,7 @@ from config import JAEGER_AGENT_HOST, JAEGER_AGENT_PORT
 from utils.app_logger import logger
 
 
-def _initialize_tracing(service_name: str) -> None:
+def _initialize_tracing(service_name: str) -> None:  # pragma: no cover
     """Initialize tracing."""
     resource = Resource(attributes={"service.name": service_name})
     trace.set_tracer_provider(TracerProvider(resource=resource))
@@ -36,7 +36,7 @@ def _initialize_tracing(service_name: str) -> None:
 def initialize_tracing_for_flask_app(
     flask_app: Flask,
     service_name: str,
-) -> None:
+) -> None:  # pragma: no cover
     """Initialize tracing for the Flask app."""
     _initialize_tracing(service_name)
 
@@ -44,7 +44,9 @@ def initialize_tracing_for_flask_app(
     logger.info("Tracing initialized for Flask app.")
 
 
-def initialize_tracing_for_celery_app(service_name: str) -> None:
+def initialize_tracing_for_celery_app(
+    service_name: str,
+) -> None:  # pragma: no cover
     """Initialize tracing for the Celery app."""
     _initialize_tracing(service_name)
 

@@ -7,7 +7,7 @@ env.read_env()
 
 DATABASE_URL = env.str(
     "DATABASE_URL",
-    "postgresql+psycopg2://username:password@localhost:5432/db",
+    "postgresql+psycopg2://username:password@db:5432/db",
 )
 
 EXCHANGE_RATES_API_URL = env.str(

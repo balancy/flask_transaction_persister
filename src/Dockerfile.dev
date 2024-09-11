@@ -3,9 +3,10 @@ FROM python:3.12-slim AS dev-builder
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-  curl\
-  && apt-get clean
+RUN apt update && \
+  apt install -y curl && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
@@ -14,7 +15,7 @@ ENV PATH="/root/.local/bin:$PATH"
 COPY pyproject.toml poetry.lock /app/
 
 
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --with tracing,metrics
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --with tracing,metrics,tests
 
 # Stage 2. Development stage
 FROM python:3.12-slim AS dev
@@ -25,14 +26,16 @@ COPY --from=dev-builder /usr/local/lib/python3.12/site-packages /usr/local/lib/p
 COPY --from=dev-builder /usr/local/bin /usr/local/bin
 
 COPY src /app/src
-COPY wait-for-it.sh entrypoint.sh alembic.ini /app/
+COPY wait-for-it.sh entrypoint.sh alembic.ini pyproject.toml /app/
 
 COPY prometheus/prometheus.yml /etc/prometheus/prometheus.yml
 COPY grafana/provisioning  /etc/grafana/provisioning
+COPY tests /app/tests
 
 ENV PYTHONPATH=/app/src
 ENV FLASK_APP=src/app.py
 ENV FLASK_ENV=development
+ENV FLASK_RUN_HOST=0.0.0.0
 ENV PROMETHEUS_MULTIPROC_DIR=/var/cache/celery_prometheus
 
 RUN mkdir -p $PROMETHEUS_MULTIPROC_DIR

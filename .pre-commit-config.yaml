@@ -3,11 +3,16 @@ repos:
     hooks:
       - id: backend-ruff
         name: Run ruff for backend
-        entry: ruff check src
+        entry: ruff check .
         language: system
         pass_filenames: false
       - id: backend-black-check
         name: Check code formatting with black for backend
         entry: black --check src
+        language: system
+        pass_filenames: false
+      - id: backend-test
+        name: Run tests for backend
+        entry: make test
         language: system
         pass_filenames: false

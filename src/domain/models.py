@@ -22,7 +22,15 @@ class ProcessedTransaction:
 
     def to_dict(self) -> dict:
         """Return transaction data as dictionary."""
-        return asdict(self)
+        data = asdict(self)
+        data["timestamp"] = data["timestamp"].isoformat()
+        return data
+
+    @staticmethod
+    def from_dict(data: dict) -> ProcessedTransaction:
+        """Create a ProcessedTransaction from a dictionary."""
+        data["timestamp"] = datetime.fromisoformat(data["timestamp"])
+        return ProcessedTransaction(**data)
 
 
 @dataclass(frozen=True, slots=True)

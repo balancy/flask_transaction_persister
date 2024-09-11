@@ -36,9 +36,8 @@ class TransactionRepository:
         except IntegrityError:
             self.db.rollback()
             id_ = transaction_data.transaction_id
-            message = f"Transaction with ID {id_} already exists."
-            raise TransactionIntegrityError(message) from None
-        except Exception:
+            raise TransactionIntegrityError(transaction_id=id_) from None
+        except Exception:  # pragma: no cover
             self.db.rollback()
             raise
 

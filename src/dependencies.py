@@ -1,48 +1,71 @@
 """App dependency injection factories module."""
 
-from injector import Binder, singleton
+import logging
 
-from application.services.exchange_rates_service import ExchangeRatesService
+from injector import Binder, Injector, singleton
+
+from application.protocols import (
+    ExchangeRatesClientProtocol,
+    QueueClientProtocol,
+    TransactionRepositoryProtocol,
+)
 from application.services.processing_services import (
     EnqueuedTransactionProcessingService,
+    IncomingTransactionProcessingService,
 )
+from domain.protocols import ProcessingServiceProtocol
 from infrastructure.external_api.clients import ExternalExchangeRatesClient
 from infrastructure.messaging.queue_client import QueueClient
 from infrastructure.persistence.repositories import TransactionRepository
-from src.application.services.processing_services import (
-    IncomingTransactionProcessingService,
-)
+from utils.app_logger import logger as app_logger
 
 
-def configure_dependencies_for_app(binder: Binder) -> None:
+def configure_dependencies_for_web_app(binder: Binder) -> None:
     """Configure dependencies for Flask-Injector."""
     binder.bind(
-        TransactionRepository,
+        TransactionRepositoryProtocol,
         to=TransactionRepository,
         scope=singleton,
     )
     binder.bind(
-        ExchangeRatesService,
-        to=ExchangeRatesService,
-        scope=singleton,
-    )
-    binder.bind(
-        IncomingTransactionProcessingService,
+        ProcessingServiceProtocol,
         to=IncomingTransactionProcessingService,
         scope=singleton,
     )
     binder.bind(
-        EnqueuedTransactionProcessingService,
+        QueueClientProtocol,
+        to=QueueClient,
+        scope=singleton,
+    )
+    binder.bind(
+        logging.Logger,
+        to=app_logger,
+        scope=singleton,
+    )
+
+
+def configure_dependencies_for_celery_app(binder: Binder) -> None:
+    """Configure dependencies for celery."""
+    binder.bind(
+        TransactionRepositoryProtocol,
+        to=TransactionRepository,
+        scope=singleton,
+    )
+    binder.bind(
+        ProcessingServiceProtocol,
         to=EnqueuedTransactionProcessingService,
         scope=singleton,
     )
     binder.bind(
-        ExternalExchangeRatesClient,
+        ExchangeRatesClientProtocol,
         to=ExternalExchangeRatesClient,
         scope=singleton,
     )
     binder.bind(
-        QueueClient,
-        to=QueueClient,
+        logging.Logger,
+        to=app_logger,
         scope=singleton,
     )
+
+
+celery_injector = Injector([configure_dependencies_for_celery_app])

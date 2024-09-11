@@ -10,9 +10,10 @@ from config import IS_TRACING_ON
 def conditional_trace_context(
     module_name: str,
     span_name: str,
+    is_tracing_on: bool = IS_TRACING_ON,  # noqa: FBT001
 ) -> Generator[Any, Any, None]:
     """Start a tracing span if IS_TRACING_ON is True."""
-    if IS_TRACING_ON:
+    if is_tracing_on:
         from opentelemetry import trace
 
         tracer = trace.get_tracer(module_name)
