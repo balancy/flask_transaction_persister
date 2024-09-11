@@ -10,6 +10,10 @@ import pytest
 
 from tasks import process_transaction
 from tests.stubs import NoOpLogger
+from utils.exceptions import (
+    FailedToFetchExchangeRateError,
+    TransactionIntegrityError,
+)
 
 from .stubs.for_celery_tasks import (
     ProcessingServiceStub,
@@ -57,7 +61,7 @@ def patch_celery_dependencies() -> Generator[None, Any, None]:
                 "user_id": "2",
                 "timestamp": "2021-01-01T01:00:00",
             },
-            {"error": "Transaction integrity error"},
+            {"error": str(TransactionIntegrityError("error_integrity"))},
             HTTPStatus.CONFLICT,
         ),
         # Failed to Fetch Exchange Rate Error Case
@@ -69,7 +73,7 @@ def patch_celery_dependencies() -> Generator[None, Any, None]:
                 "user_id": "3",
                 "timestamp": "2021-01-01T02:00:00",
             },
-            {"error": "Failed to fetch exchange rate"},
+            {"error": str(FailedToFetchExchangeRateError())},
             HTTPStatus.BAD_REQUEST,
         ),
         # Validation Error Case

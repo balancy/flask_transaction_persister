@@ -37,29 +37,25 @@ def process_transaction(
             IncomingTransactionSchema.model_validate(transaction_data)
     except ValidationError as ex:
         logger.error("Validation error: %s", ex.errors())
-        return (
-            {"error": "Validation error"},
-            HTTPStatus.BAD_REQUEST,
-        )
+
+        return ({"error": "Validation error"}, HTTPStatus.BAD_REQUEST)
 
     transaction = IncomingTransaction.from_dict(transaction_data)
 
     try:
         with conditional_trace_context(__name__, "process_transaction"):
             transaction_service.process_transaction(transaction)
+
     except TransactionIntegrityError as ex:
         logger.error(ex.message)
-        return (
-            {"error": "Transaction integrity error"},
-            HTTPStatus.CONFLICT,
-        )
+
+        return ({"error": str(ex)}, HTTPStatus.CONFLICT)
     except FailedToFetchExchangeRateError as ex:
         logger.error(ex.message)
-        return (
-            {"error": "Failed to fetch exchange rate"},
-            HTTPStatus.BAD_REQUEST,
-        )
+
+        return ({"error": str(ex)}, HTTPStatus.BAD_REQUEST)
 
     message = f"Processed transaction: {transaction.transaction_id}"
     logger.info(message)
+
     return {"status": message}, HTTPStatus.OK

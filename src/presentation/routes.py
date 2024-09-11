@@ -37,7 +37,7 @@ def post_transaction(
     except ValidationError as ex:
         logger.error("Validation error: %s", ex.errors())
         return (
-            jsonify({"error": "Validation failed", "details": ex.errors()}),
+            jsonify({"error": "Validation error"}),
             HTTPStatus.BAD_REQUEST,
         )
 
@@ -51,22 +51,15 @@ def post_transaction(
     try:
         with conditional_trace_context(__name__, "process_transaction"):
             result = transaction_service.process_transaction(transaction)
+
     except TransactionIntegrityError as ex:
         logger.error(ex.message)
-        return (
-            jsonify(
-                {"error": "Transaction integrity error", "details": str(ex)},
-            ),
-            HTTPStatus.CONFLICT,
-        )
+
+        return (jsonify({"error": str(ex)}), HTTPStatus.CONFLICT)
     except FailedToPublishMessageError as ex:
         logger.error(str(ex.message))
-        return (
-            jsonify(
-                {"error": "Failed to publish message", "details": str(ex)},
-            ),
-            HTTPStatus.SERVICE_UNAVAILABLE,
-        )
+
+        return (jsonify({"error": str(ex)}), HTTPStatus.SERVICE_UNAVAILABLE)
 
     logger.info(result)
     return jsonify(result), HTTPStatus.CREATED

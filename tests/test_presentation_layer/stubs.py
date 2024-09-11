@@ -20,7 +20,7 @@ class ProcessingServiceStub:
     ) -> dict[str, str]:
         """Process the transaction."""
         if transaction.transaction_id == "error_integrity":
-            raise TransactionIntegrityError(transaction_id=1)
+            raise TransactionIntegrityError(transaction_id="error_integrity")
         if transaction.transaction_id == "error_publish":
             raise FailedToPublishMessageError
         if transaction.transaction_id == "validation_error":

@@ -5,6 +5,11 @@ from __future__ import annotations
 from http import HTTPStatus
 from typing import TYPE_CHECKING
 
+from utils.exceptions import (
+    FailedToPublishMessageError,
+    TransactionIntegrityError,
+)
+
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
@@ -42,7 +47,7 @@ def test_post_transaction_with_validation_error(client: FlaskClient) -> None:
         response = client.post(ENDPOINT, json=invalid_transaction_data)
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert "Validation failed" in response.json["error"]
+    assert response.json == {"error": "Validation error"}
 
 
 def test_post_transaction_persisting_error(client: FlaskClient) -> None:
@@ -59,7 +64,11 @@ def test_post_transaction_persisting_error(client: FlaskClient) -> None:
         response = client.post(ENDPOINT, json=transaction_data)
 
     assert response.status_code == HTTPStatus.CONFLICT
-    assert "Transaction integrity error" in response.json["error"]
+    assert response.json == {
+        "error": str(
+            TransactionIntegrityError(transaction_id="error_integrity"),
+        ),
+    }
 
 
 def test_post_transaction_with_failed_to_publish_error(
@@ -78,4 +87,4 @@ def test_post_transaction_with_failed_to_publish_error(
         response = client.post(ENDPOINT, json=transaction_data)
 
     assert response.status_code == HTTPStatus.SERVICE_UNAVAILABLE
-    assert "Failed to publish message" in response.json["error"]
+    assert response.json == {"error": str(FailedToPublishMessageError())}
