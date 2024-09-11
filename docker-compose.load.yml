@@ -6,8 +6,6 @@ services:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
       POSTGRES_DB: db
-    ports:
-      - "5444:5432"
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -34,7 +32,7 @@ services:
     depends_on:
       - db
       - rabbitmq
-    entrypoint: ["sh", "-c", "./entrypoint.sh gunicorn -w 4 -b 0.0.0.0:5000 'app:create_app()'"]
+    entrypoint: [ "sh", "-c", "./entrypoint.sh gunicorn -w 4 -b 0.0.0.0:5000 'app:create_app()'" ]
 
   worker:
     build:
@@ -51,7 +49,7 @@ services:
       - IS_METRICS_MONITORING_ON=False
     depends_on:
       - app
-    entrypoint: ["bash", "-c", "celery -A celery_config.celery_app worker --loglevel=INFO  -Q transaction-queue"]
+    entrypoint: [ "bash", "-c", "celery -A celery_config.celery_app worker --loglevel=INFO  -Q transaction-queue" ]
 
   locust:
     image: locustio/locust

@@ -19,7 +19,11 @@ TEST_DATABASE_URL = "postgresql+psycopg2://username:password@db:5432/test_db"
 def create_test_database() -> None:
     """Create the test database if it does not exist."""
     host, db_name = TEST_DATABASE_URL.rsplit("/", 1)
-    base_engine = create_engine(host + "/postgres", echo=False)
+    base_engine = create_engine(
+        host + "/postgres",
+        echo=False,
+        isolation_level="AUTOCOMMIT",
+    )
 
     with base_engine.connect() as conn:
         result = conn.execute(
