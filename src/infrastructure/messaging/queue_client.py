@@ -1,4 +1,4 @@
-"""Module for queue client."""
+"""Queue client module."""
 
 from __future__ import annotations
 
@@ -22,12 +22,24 @@ class QueueClient:
         queue_name: str = "transaction-queue",
     ) -> None:
         """Initialize RabbitMQ connection."""
-        self.queue_name = queue_name
-        self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=queue_host),
+        self._queue_name = queue_name
+        self._queue_host = queue_host
+        self._connection = None
+        self._channel = None
+        self._connect()
+
+    def _connect(self) -> None:
+        """Establish connection and channel to RabbitMQ."""
+        self._connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=self._queue_host),
         )
-        self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.queue_name, durable=True)
+        self._channel = self._connection.channel()
+        self._channel.queue_declare(queue=self._queue_name, durable=True)
+
+    def _reconnect_if_needed(self) -> None:
+        """Reconnect to RabbitMQ if the channel is closed."""
+        if self._channel is None or self._channel.is_closed:
+            self._connect()
 
     def send_transaction_to_queue(
         self,
@@ -44,10 +56,11 @@ class QueueClient:
         }
 
         try:
-            with conditional_trace_context(__name__, "enquque_transaction"):
-                self.channel.basic_publish(
+            with conditional_trace_context(__name__, "enqueue_transaction"):
+                self._reconnect_if_needed()
+                self._channel.basic_publish(
                     exchange="",
-                    routing_key=self.queue_name,
+                    routing_key=self._queue_name,
                     body=json.dumps(message),
                     properties=pika.BasicProperties(
                         delivery_mode=2,  # Make message persistent
@@ -60,4 +73,5 @@ class QueueClient:
 
     def close_connection(self) -> None:
         """Close RabbitMQ connection."""
-        self.connection.close()
+        if self._connection and not self._connection.is_closed:
+            self._connection.close()

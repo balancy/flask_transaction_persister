@@ -24,4 +24,4 @@ RABBITMQ_URL = env.str("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672//")
 
 IS_TRACING_ON = env.bool("IS_TRACING_ON", True)
 
-IS_METRICS_MONITORING_ON = True
+IS_METRICS_MONITORING_ON = env.bool("IS_METRICS_MONITORING_ON", True)

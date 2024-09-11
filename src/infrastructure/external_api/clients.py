@@ -1,12 +1,15 @@
 """Module for external api calls clients."""
 
 import requests
+from cachetools import TTLCache, cached
 
 from config import EXCHANGE_RATES_API_URL
 from utils.context_managers import conditional_trace_context
 from utils.exceptions import FailedToFetchExchangeRateError
 
 TIMEOUT = 5
+
+cache = TTLCache(maxsize=100, ttl=60)
 
 
 class ExternalExchangeRatesClient:
@@ -16,6 +19,7 @@ class ExternalExchangeRatesClient:
         """Initialize the client."""
         self.url = EXCHANGE_RATES_API_URL
 
+    @cached(cache)
     def get_rate(self, from_currency: str, to_currency: str) -> float:
         """Fetch the conversion rate between two currencies."""
         try:

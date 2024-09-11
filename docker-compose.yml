@@ -32,6 +32,7 @@ services:
       - FLASK_ENV=production
       - PYTHON_PATH=/app/src
       - IS_TRACING_ON=${IS_TRACING_ON:-True}
+      - IS_METRICS_MONITORING_ON=${IS_METRICS_MONITORING_ON:-True}
     depends_on:
       - db
       - rabbitmq
@@ -52,6 +53,7 @@ services:
       - PYTHON_PATH=/app/src
       - PROMETHEUS_MULTIPROC_DIR=/var/cache/celery_prometheus
       - IS_TRACING_ON=${IS_TRACING_ON:-True}
+      - IS_METRICS_MONITORING_ON=${IS_METRICS_MONITORING_ON:-True}
     depends_on:
       - db
       - rabbitmq

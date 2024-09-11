@@ -91,6 +91,8 @@ class EnqueuedTransactionProcessingService:
             from_currency=transaction_data.currency,
             to_currency=TARGET_CURRENCY,
         )
+        message = f"Rate fetched successfully: {rate}"
+        self.logger.info(message)
 
         converted_amount: float = round(transaction_data.amount / rate, 2)
 
