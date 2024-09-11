@@ -20,10 +20,7 @@ from .stubs.for_flask_app import (
 @pytest.fixture(scope="module")
 def test_app_with_flags_on() -> Flask:
     """Create Flask app with metrics and tracing ON."""
-    tracing, metrics = True, True
     with (
-        patch("app.IS_METRICS_MONITORING_ON", metrics),
-        patch("app.IS_TRACING_ON", tracing),
         patch(
             "utils.tracing.initialize_tracing_for_flask_app",
             initialize_tracing_for_flask_app_stub,
@@ -36,7 +33,7 @@ def test_app_with_flags_on() -> Flask:
             configure_dependencies_for_web_app_stub,
         ),
     ):
-        app = create_app()
+        app = create_app(is_tracing_on=True, is_metrics_on=True)
         app.config.update({"TESTING": True})
         return app
 
@@ -44,10 +41,7 @@ def test_app_with_flags_on() -> Flask:
 @pytest.fixture(scope="module")
 def test_app_with_flags_off() -> Flask:
     """Create Flask app with metrics and tracing OFF."""
-    tracing, metrics = False, False
     with (
-        patch("app.IS_METRICS_MONITORING_ON", metrics),
-        patch("app.IS_TRACING_ON", tracing),
         patch("app.FlaskInjector", FlaskInjectorStub),
         patch("app.routes_blueprint", routes_blueprint_stub),
         patch(
@@ -55,7 +49,7 @@ def test_app_with_flags_off() -> Flask:
             configure_dependencies_for_web_app_stub,
         ),
     ):
-        app = create_app()
+        app = create_app(is_metrics_on=False, is_tracing_on=False)
         app.config.update({"TESTING": True})
         return app
 
