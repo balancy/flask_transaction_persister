@@ -13,7 +13,6 @@ from domain.models import IncomingTransaction
 from domain.protocols import ProcessingServiceProtocol
 from utils.context_managers import conditional_trace_context
 from utils.exceptions import (
-    FailedToFetchExchangeRateError,
     FailedToPublishMessageError,
     TransactionIntegrityError,
 )
@@ -36,7 +35,7 @@ def post_transaction(
                 raw_data,
             )
     except ValidationError as ex:
-        logger.exception("Validation error: %s", ex.errors())
+        logger.error("Validation error: %s", ex.errors())
         return (
             jsonify({"error": "Validation failed", "details": ex.errors()}),
             HTTPStatus.BAD_REQUEST,
@@ -53,7 +52,7 @@ def post_transaction(
         with conditional_trace_context(__name__, "process_transaction"):
             result = transaction_service.process_transaction(transaction)
     except TransactionIntegrityError as ex:
-        logger.exception(ex.message)
+        logger.error(ex.message)
         return (
             jsonify(
                 {"error": "Transaction integrity error", "details": str(ex)},
@@ -61,20 +60,12 @@ def post_transaction(
             HTTPStatus.CONFLICT,
         )
     except FailedToPublishMessageError as ex:
-        logger.exception(str(ex.message))
+        logger.error(str(ex.message))
         return (
             jsonify(
                 {"error": "Failed to publish message", "details": str(ex)},
             ),
             HTTPStatus.SERVICE_UNAVAILABLE,
-        )
-    except FailedToFetchExchangeRateError as ex:
-        logger.exception(ex.message)
-        return (
-            jsonify(
-                {"error": "Failed to fetch exchange rate", "details": str(ex)},
-            ),
-            HTTPStatus.BAD_REQUEST,
         )
 
     logger.info(result)

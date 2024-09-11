@@ -6,7 +6,6 @@ from pydantic import ValidationError
 
 from domain.models import IncomingTransaction
 from utils.exceptions import (
-    FailedToFetchExchangeRateError,
     FailedToPublishMessageError,
     TransactionIntegrityError,
 )
@@ -24,8 +23,6 @@ class ProcessingServiceStub:
             raise TransactionIntegrityError(transaction_id=1)
         if transaction.transaction_id == "error_publish":
             raise FailedToPublishMessageError
-        if transaction.transaction_id == "error_fetch_rate":
-            raise FailedToFetchExchangeRateError
         if transaction.transaction_id == "validation_error":
             raise ValidationError
         return {"status": "success"}

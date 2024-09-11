@@ -8,12 +8,12 @@ from flask import Flask
 
 from app import create_app
 
-from .stubs import (
+from .stubs.for_flask_app import (
     FlaskInjectorStub,
     PrometheusMetricsStub,
     configure_dependencies_for_web_app_stub,
-    initialize_tracing_for_flask_app,
-    routes_blueprint,
+    initialize_tracing_for_flask_app_stub,
+    routes_blueprint_stub,
 )
 
 
@@ -26,11 +26,11 @@ def test_app_with_flags_on() -> Flask:
         patch("app.IS_TRACING_ON", tracing),
         patch(
             "utils.tracing.initialize_tracing_for_flask_app",
-            initialize_tracing_for_flask_app,
+            initialize_tracing_for_flask_app_stub,
         ),
         patch("app.PrometheusMetrics", PrometheusMetricsStub),
         patch("app.FlaskInjector", FlaskInjectorStub),
-        patch("app.routes_blueprint", routes_blueprint),
+        patch("app.routes_blueprint", routes_blueprint_stub),
         patch(
             "dependencies.configure_dependencies_for_web_app",
             configure_dependencies_for_web_app_stub,
@@ -49,7 +49,7 @@ def test_app_with_flags_off() -> Flask:
         patch("app.IS_METRICS_MONITORING_ON", metrics),
         patch("app.IS_TRACING_ON", tracing),
         patch("app.FlaskInjector", FlaskInjectorStub),
-        patch("app.routes_blueprint", routes_blueprint),
+        patch("app.routes_blueprint", routes_blueprint_stub),
         patch(
             "dependencies.configure_dependencies_for_web_app",
             configure_dependencies_for_web_app_stub,

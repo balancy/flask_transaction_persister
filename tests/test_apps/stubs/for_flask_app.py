@@ -1,4 +1,4 @@
-"""Stubs for app tests."""
+"""Stubs for flask app."""
 
 from __future__ import annotations
 
@@ -7,16 +7,19 @@ from typing import Callable, ClassVar, Literal
 from flask import Blueprint, Flask, jsonify
 from flask.wrappers import Response
 
-routes_blueprint = Blueprint("routes_blueprint", __name__)
+routes_blueprint_stub = Blueprint("routes_blueprint_stub", __name__)
 
 
-@routes_blueprint.route("/transaction", methods=["POST"])
+@routes_blueprint_stub.route("/transaction", methods=["POST"])
 def transaction_route() -> tuple[Response, Literal[200]]:
     """Stub method for transaction route."""
     return jsonify({"message": "Test response"}), 200
 
 
-def initialize_tracing_for_flask_app(app: Flask, service_name: str) -> None:
+def initialize_tracing_for_flask_app_stub(
+    app: Flask,
+    service_name: str,
+) -> None:
     """Stub method to initialize tracing for a Flask app."""
     app.config["TRACING_INITIALIZED"] = True
     app.config["SERVICE_NAME"] = service_name

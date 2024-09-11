@@ -79,22 +79,3 @@ def test_post_transaction_with_failed_to_publish_error(
 
     assert response.status_code == HTTPStatus.SERVICE_UNAVAILABLE
     assert "Failed to publish message" in response.json["error"]
-
-
-def test_post_transaction_with_failed_to_fetch_rate_error(
-    client: FlaskClient,
-) -> None:
-    """Test post transaction with failed to fetch rate error."""
-    transaction_data = {
-        "transaction_id": "error_fetch_rate",
-        "amount": 100,
-        "currency": "USD",
-        "timestamp": "2023-01-01T00:00:00Z",
-        "user_id": "123",
-    }
-
-    with client.application.app_context():
-        response = client.post(ENDPOINT, json=transaction_data)
-
-    assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert "Failed to fetch exchange rate" in response.json["error"]
